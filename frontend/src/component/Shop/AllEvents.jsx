@@ -18,6 +18,7 @@ const AllEvents = () => {
       }, [dispatch]);
 
       console.log(events);
+      console.log(events._id);
 
       const handleDelete = (id) => {
             dispatch(deleteEvent(id));
@@ -123,9 +124,6 @@ const AllEvents = () => {
               )}
             </>
           );
-//   return (
-//     <div>AllEvents</div>
-//   )
 }
 
 export default AllEvents

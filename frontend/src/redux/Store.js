@@ -1,8 +1,8 @@
 import { configureStore } from "@reduxjs/toolkit";
 import { userReducer } from "./reducer/user";
 import sellerReducer from "./reducer/seller";
-import { productReducer } from "./reducer/product";
-import { eventReducer } from "./reducer/event";
+import productReducer from "./reducer/product";
+import eventReducer from "./reducer/event";
 import {
   persistStore,
   persistReducer,
@@ -14,17 +14,23 @@ import {
   REGISTER,
 } from "redux-persist";
 import storage from "redux-persist/lib/storage";
+import sessionStorage from "redux-persist/lib/storage/session";
+// Persistence configurations
+const persistSellerConfig = { key: "seller", storage: sessionStorage, version: 1 };
+const persistProductsConfig = { key: "products", storage, version: 1 };
+const persistEventsConfig = { key: "events", storage, version: 1 };
 
-// Persistence configuration
-const persistConfig = { key: "seller", storage, version: 1 };
-const persistedReducer = persistReducer(persistConfig, sellerReducer);
+// Persisted reducers
+const persistedSellerReducer = persistReducer(persistSellerConfig, sellerReducer);
+const persistedProductsReducer = persistReducer(persistProductsConfig, productReducer);
+const persistedEventsReducer = persistReducer(persistEventsConfig, eventReducer);
 
 const Store = configureStore({
   reducer: {
     user: userReducer,
-    seller: persistedReducer,
-    products: productReducer,
-    events: eventReducer,
+    seller: persistedSellerReducer,
+    products: persistedProductsReducer,
+    events: persistedEventsReducer,
     // cart: cartReducer,
     // wishlist: wishlistReducer,
     // order: orderReducer,

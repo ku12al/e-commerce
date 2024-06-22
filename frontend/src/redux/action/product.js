@@ -25,30 +25,28 @@ export const createProduct = (newForm) => async (dispatch) => {
 };
 
 //get all products
-
-export const getAllProductsShop = (id) => async (dispatch) => {
+export const getAllProductsShop = (sellerId) => async (dispatch) => {
   try {
     dispatch({
       type: "getAllProductsShopRequest",
     });
 
     const { data } = await axios.get(
-      `${server}/product/get-all-products-shop/${id}`
+      `${server}/product/get-all-products-shop/${sellerId}`
     );
-    console.log(data);
 
     dispatch({
       type: "getAllProductsShopSuccess",
       payload: data.products,
     });
-    
   } catch (error) {
     dispatch({
       type: "getAllProductsShopFailed",
-      payload: error.response.data.message,
+      payload: error.message || "Failed to fetch products",
     });
   }
 };
+
 
 //delete product of a shop
 

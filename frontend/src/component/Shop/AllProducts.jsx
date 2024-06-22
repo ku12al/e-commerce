@@ -12,12 +12,16 @@ const AllProducts = () => {
   const { seller } = useSelector((state) => state.seller);
   const dispatch = useDispatch();
 
+  console.log(seller);
+
   useEffect(() => {
     if (seller && seller._id) {
       dispatch(getAllProductsShop(seller._id));
     }
   }, [dispatch, seller]);
-  console.log(products);
+
+  console.log(products +"kunal");
+  console.log(products._id);
 
   
 

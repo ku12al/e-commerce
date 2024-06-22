@@ -29,7 +29,8 @@ import {
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import Store from "./redux/Store.js";
-import { loadSeller, loadUser } from "./redux/action/user";
+import {loadUser } from "./redux/action/user";
+import { loadSeller } from "./redux/action/seller.js";
 import {getAllProductsShop} from "./redux/action/product"
 import { useSelector } from "react-redux";
 import ProtectedRoute from "./routes/ProtectedRoute.js";

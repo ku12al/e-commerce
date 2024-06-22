@@ -27,11 +27,12 @@ router.post(
         productData.shop = shop;
 
         const product = await Product.create(productData);
-
+        console.log(product);
         res.status(201).json({
           success: true,
           product,
         });
+        console.log(product);
       }
     } catch (error) {
       return next(new ErrorHandler(error, 400));
@@ -47,10 +48,12 @@ router.get(
     
     try {
       const products = await Product.find({ shopId: req.params.id });
+
       res.status(201).json({
         success: true,
         products,
       });
+
 
     } catch (error) {
       return next(new ErrorHandler(error, 400));
