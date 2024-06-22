@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import Header from "../component/Layout/Header";
-import { useSearchParams } from "react-router-dom";
 import { productData } from "../static/data";
 import styles from "../style/Style";
 import ProductCart from "../component/Routes/ProductCart/ProductCart";

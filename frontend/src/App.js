@@ -31,7 +31,6 @@ import "react-toastify/dist/ReactToastify.css";
 import Store from "./redux/Store.js";
 import {loadUser } from "./redux/action/user";
 import { loadSeller } from "./redux/action/seller.js";
-import {getAllProductsShop} from "./redux/action/product"
 import { useSelector } from "react-redux";
 import ProtectedRoute from "./routes/ProtectedRoute.js";
 import { ShopHomePage } from "./ShopRoutes.js";
@@ -46,9 +45,9 @@ const App = () => {
     Store.dispatch(loadUser());
     Store.dispatch(loadSeller());
 
-    // if (isSeller === true) {
-    //   return <Navigate to="/shop" replace />;
-    // }
+    if (isSeller === true) {
+      return <Navigate to="/shop" replace />;
+    }
   }, []);
   return (
     <>

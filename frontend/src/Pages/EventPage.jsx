@@ -5,7 +5,7 @@ import Header from "../component/Layout/Header";
 // import Loader from "../components/Layout/Loader";
 
 const EventsPage = () => {
-//   const { allEvents, isLoading } = useSelector((state) => state.events);
+  // const { allEvents, isLoading } = useSelector((state) => state.events);
   return (
     <>
         <div>

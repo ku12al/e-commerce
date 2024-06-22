@@ -34,13 +34,12 @@ router.post("/create-user", upload.single("file"), async (req, res, next) => {
       return next(new ErrorHandler("seller already exists", 400))
     }
     const filename = req.file.filename;
-    console.log(filename);
+    
     const fileUrl = `/uploads/${filename}`;
     // const myCloud = await cloudinary.v2.uploader.upload(avatar, {
     //   folder: "avatars",
     // });
-    console.log(fileUrl);
-    console.log("gaari");
+    
 
 
     const user = {
@@ -53,21 +52,17 @@ router.post("/create-user", upload.single("file"), async (req, res, next) => {
     };
 
     const activationToken = createActivationToken(user);
-    // console.log(activationToken);
+
 
     const activationUrl = `http://localhost:3000/activation/${activationToken}`;
-    console.log("minini");
 
     try {
-    console.log("maari");
-
       await sendMail({
         email: user.email,
         subject: "Activation your account",
         text: `Hello ${user.name} please click on the link to activate your account ${activationUrl}`,
       });
       
-    console.log("maarisdfsd");
 
       res.status(201).json({
           success: true,
