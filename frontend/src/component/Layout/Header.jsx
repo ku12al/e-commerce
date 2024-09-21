@@ -36,7 +36,9 @@ import { backend_url } from "../../server.js";
  */
 const Header = ({ activeHeading }) => {
   const { isAuthenticated, user, loading } = useSelector((state) => state.user);
-  console.log(user)
+  const { seller } = useSelector((state) => state.seller)
+  const { cart } = useSelector((state) => state.cart)
+  const {allProducts} = useSelector((state) => state.products)
   const [searchData, setSearchData] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [active, setActive] = useState(false);
@@ -46,12 +48,13 @@ const Header = ({ activeHeading }) => {
   const [open, setOpen] = useState(false);
 
   const handleSearchChange = (e) => {
+    
     const term = e.target.value;
     setSearchTerm(term);
 
     const filteredProducts =
-      productData &&
-      productData.filter((product) =>
+    allProducts &&
+    allProducts.filter((product) =>
         product.name.toLowerCase().includes(term.toLowerCase())
       );
     setSearchData(filteredProducts);
@@ -68,7 +71,7 @@ const Header = ({ activeHeading }) => {
     <>
       <div className={`${styles.section}`}>
         <div className="hidden 800px:h-[50px] 800px:my-[20px] 800px:flex items-center justify-between">
-          <div className="w-25 my-6 animate-bounce items-center">
+          <div className="w-25 my-6 animate-pulse items-center">
             <Link to="/">
               <h1 className="font-extrabold flex text-[#9cef4e] text-4xl">
                 QuirkyCart
@@ -94,14 +97,11 @@ const Header = ({ activeHeading }) => {
               <div className="absolute min-h-[30vh] bg-slate-50 shadow-sm-2 z-[9] p-4">
                 {searchData &&
                   searchData.map((i) => {
-                    const d = i.name;
-
-                    const Product_name = d.replace(/\s+/g, "-");
                     return (
-                      <Link to={`/product/${Product_name}`}>
+                      <Link to={`/product/${i._id}`}>
                         <div className="w-full flex items-start-py-3">
                           <img
-                            src={i.image_Url[0].url}
+                            src={`${backend_url}${i.images[0]}`}
                             alt=""
                             className="w-[40px] h-[40px] mr-[10px]"
                           />
@@ -117,7 +117,7 @@ const Header = ({ activeHeading }) => {
           <div className={`${styles.button} `}>
             <Link to="/shop-create">
               <h1 className="text-[#fff] flex items-center cursor-pointer">
-                Become Seller <IoIosArrowForward className="ml-1" />
+                {seller? "Go Dashboard": "Become Seller"}<IoIosArrowForward className="ml-1" />
               </h1>
             </Link>
           </div>
@@ -177,7 +177,7 @@ const Header = ({ activeHeading }) => {
             >
               <AiOutlineShoppingCart size={30} color="rgb(255 255 255 / 83%)" />
               <span className="absolute right-0 top-0 rounded-full bg-[#ff5a3d] w-4 h-4 right top p-0 m-0 text-white font-mono text-[12px] leading-tight text-center">
-                0
+                {cart && cart.length}
               </span>
             </div>
 
@@ -234,11 +234,14 @@ const Header = ({ activeHeading }) => {
           </div>
           <div className="w-14">
             <Link to="/">
-              <img
+              {/* <img
                 src="https://ouch-cdn2.icons8.com/0leESmvkns4GrVJPfvmlzEAg0WCsNMhwCm8AcWAyyaM/rs:fit:368:254/czM6Ly9pY29uczgu/b3VjaC1wcm9kLmFz/c2V0cy9zdmcvNzYv/ZjZiZDQ3YzgtNmY2/YS00ODk1LWIzMDMt/YWNhOTU4M2M4M2Nk/LnN2Zw.png"
                 alt="kunal pic"
                 className="mt-3 cursor-pointer"
-              />
+              /> */}
+              <h1 className="font-extrabold flex text-[#9cef4e] text-4xl">
+                QuirkyCart
+              </h1>
             </Link>
           </div>
 
@@ -246,7 +249,7 @@ const Header = ({ activeHeading }) => {
             <div className="relative mr-[20px]">
               <AiOutlineShoppingCart size={30} className="cursor-pointer" />
               <span className="absolute right-0 top-0 rounded-full bg-[#ff5a3d] w-4 h-4 right top p-0 m-0 text-white font-mono text-[12px] leading-tight text-center">
-                0
+              {cart && cart.length}
               </span>
             </div>
           </div>

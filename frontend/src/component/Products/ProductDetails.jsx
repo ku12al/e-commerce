@@ -1,13 +1,36 @@
-import React, { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { Link, useNavigate, useParams } from "react-router-dom";
+import { useSelector, useDispatch } from "react-redux";
 import styles from "../../style/Style";
-import { AiFillHeart, AiOutlineHeart, AiOutlineMessage, AiOutlineShoppingCart } from "react-icons/ai";
+import {
+  AiFillHeart,
+  AiOutlineHeart,
+  AiOutlineMessage,
+  AiOutlineShoppingCart,
+} from "react-icons/ai";
+import { backend_url } from "../../server";
+import { getAllProductsShop } from "../../redux/action/product";
+import { addToWishlist, removeFromwishlist } from "../../redux/action/wishlist";
+import { addTocart } from "../../redux/action/cart";
+import { toast } from "react-toastify";
 
 const ProductDetails = ({ data }) => {
+  const { wishlist } = useSelector((state) => state.wishlist);
+  const { cart } = useSelector((state) => state.cart);
+  const { products } = useSelector((state) => state.products);
   const [count, setCount] = useState(1);
   const [click, setClick] = useState(false);
   const [select, setSelect] = useState(1);
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+  useEffect(() => {
+    dispatch(getAllProductsShop(data && data?.shop._id));
+    if (wishlist && wishlist.find((i) => i._id === data?._id)) {
+      setClick(true);
+    } else {
+      setClick(false);
+    }
+  }, [dispatch, data, wishlist]);
 
   const incrementCount = () => {
     setCount(count + 1);
@@ -15,6 +38,31 @@ const ProductDetails = ({ data }) => {
 
   const decrementCount = () => {
     setCount(count - 1);
+  };
+
+  const removeFromWishlistHandler = (data) => {
+    setClick(!click);
+    dispatch(removeFromwishlist(data));
+  };
+
+  const addToWishlistHandler = (data) => {
+    setClick(!click);
+    dispatch(addToWishlist(data));
+  };
+
+  const addToCartHandler = (id) => {
+    const isItemExits = cart && cart.find((i) => i._id === id);
+    if (isItemExits) {
+      toast.error("Item already in cart");
+    } else {
+      if (data.stock < count) {
+        toast.success("Product stock limited");
+      } else {
+        const cartData = { ...data, qty: count };
+        dispatch(addTocart(cartData));
+        toast.success("Item added to cart successfully");
+      }
+    }
   };
 
   const handleMessageSubmit = () => {
@@ -29,24 +77,27 @@ const ProductDetails = ({ data }) => {
             <div className="block w-full 800px:flex">
               <div className="w-full 800px:w-[50%]">
                 <img
-                  src={data?.image_Url[select].url}
+                  src={`${backend_url}${data && data.images[select]}`}
                   alt=""
                   className="w-[80%]"
                 />
 
-                <div className="w-full flex">
-                  <div
-                    className={`${
-                      select === 0 ? "border" : "null"
-                    } cursor-pointer`}
-                  >
-                    <img
-                      src={data?.image_Url[0].url}
-                      alt=""
-                      className="h-[200px]"
-                      onClick={() => setSelect(0)}
-                    />
-                  </div>
+                <div className="w-full flex flex-wrap">
+                  {data &&
+                    data.images.map((i, index) => {
+                      <div
+                        className={`${
+                          select === 0 ? "border" : "null"
+                        } cursor-pointer`}
+                      >
+                        <img
+                          src={`${backend_url}${i}`}
+                          alt=""
+                          className="h-[200px] overflow-hidden mr-3 mt-3"
+                          onClick={() => setSelect(index)}
+                        />
+                      </div>;
+                    })}
 
                   <div
                     className={`${
@@ -54,7 +105,7 @@ const ProductDetails = ({ data }) => {
                     } cursor-pointer`}
                   >
                     <img
-                      src={data?.image_Url[1].url}
+                      src={`${backend_url}${data.images && data.images[1]}`}
                       alt=""
                       className="h-[200px]"
                       onClick={() => setSelect(1)}
@@ -68,10 +119,10 @@ const ProductDetails = ({ data }) => {
 
                 <div className="flex pt-3">
                   <h4 className={`${styles.productDiscountPrice}`}>
-                    {data.discount_price}$
+                    {data.discountPrice}$
                   </h4>
-                  <h3 className={`${styles.noramlFlex}`}>
-                    {data.price ? data.price + "$" : null}
+                  <h3 className={`${styles.price}`}>
+                    {data.originalPrice ? data.originalPrice + "$" : null}
                   </h3>
                 </div>
 
@@ -101,7 +152,7 @@ const ProductDetails = ({ data }) => {
                       <AiFillHeart
                         size={30}
                         className="cursor-pointer"
-                        onClick={() => setClick(!click)}
+                        onClick={() => removeFromWishlistHandler(data)}
                         color={click ? "red" : "#333"}
                         title="Remove from wishlist"
                       />
@@ -109,166 +160,167 @@ const ProductDetails = ({ data }) => {
                       <AiOutlineHeart
                         size={30}
                         className="cursor-pointer"
-                        onClick={() => setClick(!click)}
+                        onClick={() => addToWishlistHandler(data)}
                         color={click ? "red" : "#333"}
                         title="Add to wishlist"
                       />
                     )}
                   </div>
                 </div>
-                <div className={`${styles.button} !mt-6 !rounded !h-11 flex items-center`}>
+                <div
+                  className={`${styles.button} !mt-6 !rounded !h-11 flex items-center`}
+                  onClick={() => addToCartHandler(data._id)}
+                >
                   <span className="text-white flex items-center">
-                        Add to cart <AiOutlineShoppingCart className="ml-1"/>
+                    Add to cart <AiOutlineShoppingCart className="ml-1" />
                   </span>
                 </div>
 
                 <div className="flex items-center pt-8">
-                  <img src={data.shop.shop_avatar.url} alt="" className="w-[50px] h-[50px] rounded-full mr-2"/>
+                  <Link to={`/shop/preview/${data.seller._id}`}>
+                  <img
+                    src={`${backend_url}${data?.shop?.avatar}`}
+                    alt=""
+                    className="w-[50px] h-[50px] rounded-full mr-2"
+                  />
+                  </Link>
                   <div className="pr-8">
-                        <h3 className={`${styles.shop_name} pb-1 pt-1`}>
-                              {data.shop.name}
-                        </h3>
-                        <h5 className="pb-3 text-[15px]">
-                              ({data.shop.ratings}) Ratings
-                        </h5>
+                    <h3 className={`${styles.shop_name} pb-1 pt-1`}>
+                      {data.shop.name}
+                    </h3>
+                    <h5 className="pb-3 text-[15px]">(4/5) Ratings</h5>
                   </div>
 
-                  <div className={`${styles.button} bg-lime-400 mt-4 !rounded !h-11`}
-                  
-                  onClick={handleMessageSubmit}>
-                        <span className="text-black flex items-center">
-                              Send Message <AiOutlineMessage className="ml-1"/>
-                        </span>
+                  <div
+                    className={`${styles.button} bg-lime-400 mt-4 !rounded !h-11`}
+                    onClick={handleMessageSubmit}
+                  >
+                    <span className="text-black flex items-center">
+                      Send Message <AiOutlineMessage className="ml-1" />
+                    </span>
                   </div>
                 </div>
               </div>
             </div>
           </div>
 
-          <ProductDetailsInfo data={data}/>
-          <br/>
-          <br/>
-
+          <ProductDetailsInfo data={data} products={products} />
+          <br />
+          <br />
         </div>
       ) : null}
     </div>
   );
 };
 
-
-const ProductDetailsInfo = ({data}) => {
+const ProductDetailsInfo = ({ data, products }) => {
   const [active, setActive] = useState(1);
-  return(
+  return (
     <div className="bg-[#eeeef3] px-3 800px:px-10 py-2 rounded">
       <div className="w-full flex justify-between border-b pt-10 pb-2">
         <div className="relative">
-          <h5 className={`text-[#000] text-[18px] leading-5 font-[600] cursor-pointer 800px:text-[20px]`}
-           onClick={() => setActive(1)}>
+          <h5
+            className={`text-[#000] text-[18px] leading-5 font-[600] cursor-pointer 800px:text-[20px]`}
+            onClick={() => setActive(1)}
+          >
             Product Details
           </h5>
           {active === 1 ? (
             <div className={`${styles.active_indicator}`}></div>
-          ):null}
+          ) : null}
         </div>
 
         <div className="relative">
-          <h5 className={`text-[#000] text-[18px] leading-5 font-[600] cursor-pointer 800px:text-[20px]`}
-           onClick={() => setActive(2)}>
+          <h5
+            className={`text-[#000] text-[18px] leading-5 font-[600] cursor-pointer 800px:text-[20px]`}
+            onClick={() => setActive(2)}
+          >
             Product Reviews
           </h5>
           {active === 2 ? (
             <div className={`${styles.active_indicator}`}></div>
-          ):null}
+          ) : null}
         </div>
 
         <div className="relative">
-          <h5 className={`text-[#000] text-[18px] leading-5 font-[600] cursor-pointer 800px:text-[20px]`}
-           onClick={() => setActive(3)}>
+          <h5
+            className={`text-[#000] text-[18px] leading-5 font-[600] cursor-pointer 800px:text-[20px]`}
+            onClick={() => setActive(3)}
+          >
             Seller Information
           </h5>
           {active === 3 ? (
             <div className={`${styles.active_indicator}`}></div>
-          ):null}
+          ) : null}
         </div>
       </div>
 
-      {
-        active === 1 ? (
-          <>
+      {active === 1 ? (
+        <>
           <p className="py-2 text-[18px] leading-8 pb-10 whitespace-pre-line">
-            Lorem ipsum dolor sit amet, consectetur adipisicing elit. Veniam ad nulla, repellat, iure modi sint incidunt molestias provident culpa maxime nesciunt laboriosam rem eveniet alias voluptates at assumenda blanditiis eligendi?
+            {data.description}
           </p>
-
-          <p className="py-2 text-[18px] leading-8 pb-10 whitespace-pre-line">
-            Lorem ipsum dolor sit amet consectetur, adipisicing elit. Itaque eaque officiis in voluptates quis esse ipsa assumenda expedita.
-            Debitis odio exercitationem alias dolor saepe velit cumque mollitia, incidunt quisquam maiores asperiores,
-            quos nulla aliquam. Delectus aperiam aut odio assumenda nihil laboriosam iste quaerat, exercitationem, odit laborum, quae ex quisquam id.
-          </p>
-
-          <p className="py-2 text-[18px] leading-8 pb-10 whitespace-pre-line">
-            Lorem ipsum dolor sit amet consectetur, adipisicing elit. Itaque eaque officiis in voluptates quis esse ipsa assumenda expedita.
-            Debitis odio exercitationem alias dolor saepe velit cumque mollitia, incidunt quisquam maiores asperiores,
-            quos nulla aliquam. Delectus aperiam aut odio assumenda nihil laboriosam iste quaerat, exercitationem, odit laborum, quae ex quisquam id.
-          </p>
-          </>
-        ):null
-      }
-      {
-        active === 2 ? (
-          <>
+        </>
+      ) : null}
+      {active === 2 ? (
+        <>
           <p className="py-2 text-[18px] leading-8 pb-10 whitespace-pre-line">
             <span className=" flex justify-center">No Review yet!</span>
           </p>
-          </>
-        ):null
-      }
-      {
-        active === 3 ? (
-          <div className="w-full block 800px:flex p-5">
-            <div className="w-full 800px:w-[50%]">
+        </>
+      ) : null}
+      {active === 3 && (
+        <div className="w-full block 800px:flex p-5">
+          <div className="w-full 800px:w-[50%]">
+            <Link to={`/shop/preview/${data.shop._id}`}>
               <div className="flex items-center">
-                <img src={data.shop.shop_avatar.url} alt="" className="w-[50px] rounded-full"/>
+                <img
+                  src={`${backend_url}${data?.shop?.avatar}`}
+                  alt=""
+                  className="w-[50px] rounded-full"
+                />
                 <div className="pl-3">
-                        <h3 className={`${styles.shop_name}`}>
-                              {data.shop.name}
-                        </h3>
-                        <h5 className="pb-2 text-[15px]">
-                              ({data.shop.ratings}) Ratings
-                        </h5>
+                  <h3 className={`${styles.shop_name}`}>{data.shop.name}</h3>
+                  <h5 className="pb-2 text-[15px]">(4/5) Ratings</h5>
                 </div>
               </div>
-              <p className="py-2 text-[18px] leading-8 pb-10 whitespace-pre-line">
-                Lorem ipsum dolor sit amet, consectetur adipisicing elit. Quidem, nulla autem! Possimus quidem ullam voluptas corporis
-                 et sunt dicta vel quos reiciendis. Quas deserunt ullam velit quo ab porro.
-                Modi dolores accusamus ex provident quod, sapiente inventore commodi labore aperiam temporibus ut odio. Ea autem ullam laborum sunt cupiditate. Omnis?
-              </p>
-            </div>
+            </Link>
+            <p className="py-2 text-[18px] leading-8 pb-10 whitespace-pre-line">
+              {data.shop.description}
+            </p>
+          </div>
 
-            <div className="w-full 800px:w-[50%] mt-5 800px:mt-0 800px:flex flex-col items-end">
-              <div className="text-left">
-                <h5 className="font-[600]">
-                  Joined on: <span className="font-[500]">6 march, 2024</span>
-                </h5>
-                <h5 className="font-[600] pt-2">
-                  Total Products: <span className="font-[500]">1, 234</span>
-                </h5>
-                <h5 className="font-[600] pt-2">
-                  Total Reviews: <span className="font-[500]">6 march, 2024</span>
-                </h5>
+          <div className="w-full 800px:w-[50%] mt-5 800px:mt-0 800px:flex flex-col items-end">
+            <div className="text-left">
+              <h5 className="font-[600]">
+                Joined on:{" "}
+                <span className="font-[500]">
+                  {data.shop?.createdAt?.slice(0.1)}
+                </span>
+              </h5>
+              <h5 className="font-[600] pt-2">
+                Total Products:{" "}
+                <span className="font-[500]">
+                  {products && products.length}
+                </span>
+              </h5>
+              <h5 className="font-[600] pt-2">
+                Total Reviews: <span className="font-[500]">6 march, 2024</span>
+              </h5>
 
-                <Link to="/">
-                  <div className={`${styles.button} !rounded-[4px] !h-[39.5px] mt-3`}>
-                    <h5 className="text-white">Visite shop</h5>
-                  </div>
-                </Link>
-              </div>
+              <Link to="/">
+                <div
+                  className={`${styles.button} !rounded-[4px] !h-[39.5px] mt-3`}
+                >
+                  <h5 className="text-white">Visite shop</h5>
+                </div>
+              </Link>
             </div>
           </div>
-        ):null
-      }
+        </div>
+      )}
     </div>
-    
-  )
-}
+  );
+};
 
 export default ProductDetails;

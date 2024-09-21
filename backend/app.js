@@ -26,10 +26,12 @@ if(process.env.NODE_ENV !== 'production'){
 }
 
 const user = require("./controller/user");
-const shop = require("./controller/shop");
+const shop = require("./controller/seller");
 const product = require("./controller/product");
 const event = require("./controller/event");
 const coupon = require("./controller/couponCode")
+const payment = require("./controller/payment")
+const order = require("./controller/order")
 
 
 app.use("/user",user);
@@ -37,6 +39,8 @@ app.use("/shop",shop);
 app.use("/product",product);
 app.use("/event",event);
 app.use("/coupon", coupon);
+app.use("/payment", payment)
+app.use("/order", order);
 
 
 

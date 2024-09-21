@@ -1,35 +1,36 @@
-import { createSlice } from "@reduxjs/toolkit";
+import { createReducer } from "@reduxjs/toolkit";
 
 const initialState = {
   isSeller: false,
-  isLoading: false,
+  isLoading: false,  // Ensure this is included
   seller: null,
   error: null,
 };
 
-export const sellerSlice = createSlice({
-  name: 'seller',
-  initialState,
-  reducers: {
-    loadSellerRequest: (state) => {
+export const sellerReducer = createReducer(initialState, builder => {
+  builder
+    .addCase('loadSellerRequest', (state) => {
       state.isLoading = true;
-    },
-    loadSellerSuccess: (state, action) => {
-      state.isSeller = true;
+    })
+    .addCase('loadSellerSuccess', (state, action) => {
       state.isLoading = false;
+      state.isSeller = true;
       state.seller = action.payload;
-    },
-    loadSellerFail: (state, action) => {
+    })
+    .addCase('loadSellerFail', (state, action) => {
       state.isLoading = false;
       state.error = action.payload;
       state.isSeller = false;
-    },
-    clearErrors: (state) => {
+    })
+    .addCase('clearErrors', (state) => {
       state.error = null;
-    }
-  }
+    });
 });
 
-export const { loadSellerRequest, loadSellerSuccess, loadSellerFail, clearErrors } = sellerSlice.actions;
+// Action creators
+export const loadSellerRequest = () => ({ type: 'loadSellerRequest' });
+export const loadSellerSuccess = (payload) => ({ type: 'loadSellerSuccess', payload });
+export const loadSellerFail = (payload) => ({ type: 'loadSellerFail', payload });
+export const clearErrors = () => ({ type: 'clearErrors' });
 
-export default sellerSlice.reducer;
+export default sellerReducer;

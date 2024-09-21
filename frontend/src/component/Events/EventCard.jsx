@@ -2,9 +2,10 @@ import React from "react";
 import CountDown from "./CountDown.jsx";
 import { Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-// import { addTocart } from "../../redux/actions/cart.js";
+import { addTocart } from "../../redux/action/cart.js";
 import { toast } from "react-toastify";
 import styles from "../../style/Style.js";
+import { backend_url } from "../../server.js";
 
 const EventCard = ({ active, data }) => {
   const { cart } = useSelector((state) => state.cart);
@@ -19,7 +20,7 @@ const EventCard = ({ active, data }) => {
         toast.error("Product stock limited!");
       } else {
         const cartData = { ...data, qty: 1 };
-        // dispatch(addTocart(cartData));
+        dispatch(addTocart(cartData));
         toast.success("Item added to cart successfully!");
       }
     }
@@ -52,7 +53,7 @@ const EventCard = ({ active, data }) => {
         <CountDown data={data} />
         <br />
         <div className="flex items-center">
-          <Link to={`/product/${data._id}?isEvent=true`}>
+          <Link to={`/product/${data._id}isEvents=true`}>
             <div className={`${styles.button} text-[#fff]`}>See Details</div>
           </Link>
           <div className={`${styles.button} text-[#fff] ml-5`} onClick={() => addToCartHandler(data)}>Add to cart</div>

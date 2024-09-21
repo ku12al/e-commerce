@@ -1,6 +1,5 @@
 import "./App.css";
-import React from "react";
-import { useEffect } from "react";
+import React, { useEffect } from "react";
 import { Navigate, BrowserRouter, Routes, Route } from "react-router-dom";
 import {
   LoginPage,
@@ -9,13 +8,17 @@ import {
   HomePage,
   ProductPage,
   BestSellingPage,
-  EventPage,
+  EventsPage,
   FAQPage,
   ProductDetailsPage,
   ProfilePage,
   ShopCreatePage,
   SellerActivationPage,
   ShopLoginPage,
+  CheckoutPage,
+  PaymentPage,
+  OrderSuccessPage,
+  OrderDetailsPage,
 } from "./routes/Routes.js";
 
 import {
@@ -25,6 +28,8 @@ import {
   ShopCreateEvents,
   ShopAllEvents,
   ShopAllCoupouns,
+  ShopAllOrders,
+  ShopOrdersDetails
 } from "./routes/ShopRoutes.js";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -35,25 +40,52 @@ import { useSelector } from "react-redux";
 import ProtectedRoute from "./routes/ProtectedRoute.js";
 import { ShopHomePage } from "./ShopRoutes.js";
 import SellerProtectedRoute from "./routes/SellerProtectedRoutes.js";
+import Loader from "./component/Layout/Loader.jsx";
+import { getAllEvents } from "./redux/action/event.js";
+import { getAllProducts } from "./redux/action/product.js";
+import { useState } from "react";
+import axios from "axios";
+import { server } from "./server.js";
+import { Elements } from '@stripe/react-stripe-js';
+import { loadStripe } from '@stripe/stripe-js';
 
 const App = () => {
+  const [stripeApikey, setStripeApikey] = useState("");
+
+
+  async function getStripeApiKey(){
+    const { data } = await axios.get(`${server}/payment/stripeapikey`);
+    setStripeApikey(data.stripeApikey);
+  }
   const { loading, isAuthenticated } = useSelector((state) => state.user);
   const { isLoading, isSeller } = useSelector((state) => state.seller);
 
   useEffect(() => {
-    console.log("Dispatch")
     Store.dispatch(loadUser());
     Store.dispatch(loadSeller());
+    Store.dispatch(getAllProducts());
+    Store.dispatch(getAllEvents());
+    getStripeApiKey();
 
-    if (isSeller === true) {
-      return <Navigate to="/shop" replace />;
-    }
+
+    // if (isSeller === true) {
+    //   return <Navigate to="/shop" replace />;
+    // }
   }, []);
   return (
     <>
-      {loading || isLoading ? null : (
+      {loading || isLoading ? <Loader/> : (
         <div className="App">
           <BrowserRouter>
+          {
+            stripeApikey && (
+              <Elements stripe={loadStripe(stripeApikey)}>
+                <Routes>
+                <Route path="/payment" element={<PaymentPage />} />
+                </Routes>
+              </Elements>
+            )
+          }
             <Routes>
               <Route path="/" element={<HomePage />} />
               <Route path="/login" element={<LoginPage />} />
@@ -63,15 +95,33 @@ const App = () => {
                 element={<ActivationPage />}
               />
               <Route path="/products" element={<ProductPage />} />
-              <Route path="/product/:name" element={<ProductDetailsPage />} />
+              <Route path="/product/:id" element={<ProductDetailsPage />} />
               <Route path="/best-selling" element={<BestSellingPage />} />
-              <Route path="/events" element={<EventPage />} />
+              <Route path="/events" element={<EventsPage />} />
               <Route path="/faq" element={<FAQPage />} />
+              <Route path="/order-success" element={<OrderSuccessPage/>} />
+
+              <Route
+                path="/checkout"
+                element={
+                  // <ProtectedRoute isAuthenticated={isAuthenticated}>
+                    <CheckoutPage />
+                  // </ProtectedRoute>
+                }
+              />
               <Route
                 path="/profile"
                 element={
                   <ProtectedRoute isAuthenticated={isAuthenticated}>
                     <ProfilePage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/user/order/:id"
+                element={
+                  <ProtectedRoute isAuthenticated={isAuthenticated}>
+                    <OrderDetailsPage />
                   </ProtectedRoute>
                 }
               />
@@ -106,6 +156,25 @@ const App = () => {
                 path="/dashboard-create-product"
                 element={
                   <ShopCreateProduct />
+                  // <SellerProtectedRoute>
+
+                  // </SellerProtectedRoute>
+                }
+              />
+              
+              <Route
+                path="/dashboard-orders"
+                element={
+                  <ShopAllOrders />
+                  // <SellerProtectedRoute>
+
+                  // </SellerProtectedRoute>
+                }
+              />
+              <Route
+                path="/order/:id"
+                element={
+                  <ShopOrdersDetails />
                   // <SellerProtectedRoute>
 
                   // </SellerProtectedRoute>

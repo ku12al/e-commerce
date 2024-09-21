@@ -5,7 +5,6 @@ import Loader from "../component/Layout/Loader.jsx"
 const SellerProtectedRoute = ({children}) => {
 
       const {isLoading, isSeller} = useSelector((state) => state.seller)
-      console.log(isSeller);
       if(isLoading === true){
             return <Loader/> 
       }

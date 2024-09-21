@@ -1,42 +1,65 @@
-import { Button } from "@material-ui/core";
-import { DataGrid } from "@material-ui/data-grid";
-import React, { useEffect } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { getAllProductsShop, deleteProduct } from '../../redux/action/product';
-import { AiOutlineDelete, AiOutlineEye } from 'react-icons/ai';
-import { Link } from 'react-router-dom';
+import React, { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { deleteProduct, getAllProductsShop } from "../../redux/action/product";
+import { AiOutlineDelete, AiOutlineEye } from "react-icons/ai";
 import Loader from "../Layout/Loader";
+import { DataGrid } from "@material-ui/data-grid";
+import { Link } from "react-router-dom";
+import { Button } from "@material-ui/core";
 
 const AllProducts = () => {
-  const { products, isLoading } = useSelector((state) => state.products);
+  const { products, isloading, deleteSuccess } = useSelector(
+    (state) => state.products
+  );
   const { seller } = useSelector((state) => state.seller);
-  const dispatch = useDispatch();
-
-  console.log(seller);
-
-  useEffect(() => {
-    if (seller && seller._id) {
-      dispatch(getAllProductsShop(seller._id));
-    }
-  }, [dispatch, seller]);
-
-  console.log(products +"kunal");
-  console.log(products._id);
-
+  console.log("productsAll", products);
   
 
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    dispatch(getAllProductsShop(seller._id));
+  }, []);
+
   const handleDelete = (id) => {
-    dispatch(deleteProduct(id)).then(() => {
-      dispatch(getAllProductsShop(seller._id));
-    });
+    dispatch(deleteProduct(id));
+   
+      if (deleteSuccess) {
+        window.location.reload();
+      }
+  
+    
   };
 
   const columns = [
     { field: "id", headerName: "Product Id", minWidth: 150, flex: 0.7 },
-    { field: "name", headerName: "Name", minWidth: 180, flex: 1.4 },
-    { field: "price", headerName: "Price", minWidth: 100, flex: 0.6 },
-    { field: "Stock", headerName: "Stock", type: "number", minWidth: 80, flex: 0.5 },
-    { field: "sold", headerName: "Sold out", type: "number", minWidth: 130, flex: 0.6 },
+    {
+      field: "name",
+      headerName: "Name",
+      minWidth: 180,
+      flex: 1.4,
+    },
+    {
+      field: "price",
+      headerName: "Price",
+      minWidth: 100,
+      flex: 0.6,
+    },
+    {
+      field: "Stock",
+      headerName: "Stock",
+      type: "number",
+      minWidth: 80,
+      flex: 0.5,
+    },
+
+    {
+      field: "sold",
+      headerName: "Sold out",
+      type: "number",
+      minWidth: 130,
+      flex: 0.6,
+    },
     {
       field: "Preview",
       flex: 0.8,
@@ -45,13 +68,16 @@ const AllProducts = () => {
       type: "number",
       sortable: false,
       renderCell: (params) => {
-        const productName = params.row.name.replace(/\s+/g, "-");
+        const d = params.row.name;
+        const product_name = d.replace(/\s+/g, "-");
         return (
-          <Link to={`/product/${productName}`}>
-            <Button>
-              <AiOutlineEye size={20} />
-            </Button>
-          </Link>
+          <>
+            <Link to={`/product/${product_name}`}>
+              <Button>
+                <AiOutlineEye size={20} />
+              </Button>
+            </Link>
+          </>
         );
       },
     },
@@ -62,30 +88,41 @@ const AllProducts = () => {
       headerName: "",
       type: "number",
       sortable: false,
-      renderCell: (params) => (
-        <Button onClick={() => handleDelete(params.id)}>
-          <AiOutlineDelete size={20} />
-        </Button>
-      ),
+      renderCell: (params) => {
+        return (
+          <>
+            <Button onClick={() => handleDelete(params.id)}>
+              <AiOutlineDelete size={20} />
+            </Button>
+          </>
+        );
+      },
     },
   ];
 
-  const rows = products ? products.map(item => ({
-    id: item._id,
-    name: item.name,
-    price: `US$ ${item.discountPrice}`,
-    Stock: item.stock,
-    sold: item.sold_out,
-  })) : [];
+  const row = [];
+
+  products &&
+    products.forEach((item) => {
+      // console.log("item",item);
+
+      row.push({
+        id: item._id,
+        name: item.name,
+        price: "US$ " + item.discountPrice,
+        Stock: item.stock,
+        sold: 10,
+      });
+    });
 
   return (
     <>
-      {isLoading ? (
+      {isloading ? (
         <Loader />
       ) : (
         <div className="w-full mx-8 pt-1 mt-10 bg-white">
           <DataGrid
-            rows={rows}
+            rows={row}
             columns={columns}
             pageSize={10}
             disableSelectionOnClick
@@ -95,6 +132,6 @@ const AllProducts = () => {
       )}
     </>
   );
-}
+};
 
 export default AllProducts;

@@ -1,70 +1,68 @@
-import { createSlice } from "@reduxjs/toolkit";
+import { createReducer } from "@reduxjs/toolkit";
 
 const initialState = {
-  isLoading: true,
+  isLoading: false,
   product: null,
   products: [],
-  success: false,
+  allProducts: [],
   error: null,
   message: null,
+  success: false,
 };
 
-const productSlice = createSlice({
-  name: 'products',
-  initialState,
-  reducers: {
-    productCreateRequest: (state) => {
+export const productReducer = createReducer(initialState, (builder) => {
+  builder
+    .addCase('productCreateRequest', (state) => {
       state.isLoading = true;
-    },
-    productCreateSuccess: (state, action) => {
+    })
+    .addCase('productCreateSuccess', (state, action) => {
       state.isLoading = false;
       state.product = action.payload;
       state.success = true;
-    },
-    productCreateFail: (state, action) => {
+    })
+    .addCase('productCreateFail', (state, action) => {
       state.isLoading = false;
       state.error = action.payload;
       state.success = false;
-    },
-    getAllProductsShopRequest: (state) => {
+    })
+    
+    // Get all products of shop
+    .addCase('getAllProductsShopRequest', (state) => {
       state.isLoading = true;
-    },
-    getAllProductsShopSuccess: (state, action) => {
+    })
+    .addCase('getAllProductsShopSuccess', (state, action) => {
       state.isLoading = false;
       state.products = action.payload;
-    },
-    getAllProductsShopFail: (state, action) => {
+    })
+    .addCase('getAllProductsShopFail', (state, action) => {
       state.isLoading = false;
       state.error = action.payload;
-    },
-    deleteProductRequest: (state) => {
+    })
+    // Delete product of a shop
+    .addCase('deleteProductRequest', (state) => {
       state.isLoading = true;
-    },
-    deleteProductSuccess: (state, action) => {
+    })
+    .addCase('deleteProductSuccess', (state, action) => {
       state.isLoading = false;
       state.message = action.payload;
-    },
-    deleteProductFail: (state, action) => {
+    })
+    .addCase('deleteProductFail', (state, action) => {
       state.isLoading = false;
       state.error = action.payload;
-    },
-    clearErrors: (state) => {
+    })
+    // Get all products
+    .addCase('getAllProductsRequest', (state) => {
+      state.isLoading = true;
+    })
+    .addCase('getAllProductsSuccess', (state, action) => {
+      state.isLoading = false;
+      state.allProducts = action.payload;
+    })
+    .addCase('getAllProductsFail', (state, action) => {
+      state.isLoading = false;
+      state.error = action.payload;
+    })
+    .addCase('clearErrors', (state) => {
       state.error = null;
-    },
-  },
+    });
 });
-
-export const {
-  productCreateRequest,
-  productCreateSuccess,
-  productCreateFail,
-  getAllProductsShopRequest,
-  getAllProductsShopSuccess,
-  getAllProductsShopFail,
-  deleteProductRequest,
-  deleteProductSuccess,
-  deleteProductFail,
-  clearErrors,
-} = productSlice.actions;
-
-export default productSlice.reducer;

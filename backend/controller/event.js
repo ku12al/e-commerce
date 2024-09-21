@@ -44,9 +44,23 @@ router.post(
     );
 
 
-    
-    //get all events of a shop
 
+    
+    //get all events
+    router.get("/get-all-events", async (req, res, next) =>{
+      try {
+        const events = await Event.find();
+        res.status(201).json({
+          success: true,
+          events,
+        });
+      }catch(error){
+        return next(new ErrorHandler(error, 400))
+      }
+    })
+
+    
+//get all events of a shop
 router.get(
   "/get-all-events/:id",
   catchAsyncError(async (req, res, next) => {
@@ -98,4 +112,6 @@ router.delete(
     }
   })
 );
-    module.exports = router;
+
+
+module.exports = router;
