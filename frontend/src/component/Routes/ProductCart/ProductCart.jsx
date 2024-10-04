@@ -11,51 +11,54 @@ import {
 import ProductDetailsCard from "../ProductDetailsCard/ProductDetailsCard";
 import { backend_url } from "../../../server";
 import { useDispatch, useSelector } from "react-redux";
-import { addToWishlist, removeFromwishlist } from "../../../redux/action/wishlist";
+import {
+  addToWishlist,
+  removeFromwishlist,
+} from "../../../redux/action/wishlist";
 import { addTocart } from "../../../redux/action/cart";
 import { toast } from "react-toastify";
+import Ratings from "../../Products/Ratings";
 
 const ProductCart = ({ data }) => {
-  const {wishlist} = useSelector((state) => state.wishlist);
-  const {cart} = useSelector((state) => state.cart)
+  const { wishlist } = useSelector((state) => state.wishlist);
+  const { cart } = useSelector((state) => state.cart);
   const [click, setClick] = useState(false);
   const [count, setCount] = useState(1);
   const [open, setOpen] = useState(false);
   const dispatch = useDispatch();
 
   useEffect(() => {
-    if(wishlist && wishlist.find((i) => i._id === data._id)){
+    if (wishlist && wishlist.find((i) => i._id === data._id)) {
       setClick(true);
-    }
-    else{
+    } else {
       setClick(false);
     }
-  },[wishlist])
+  }, [wishlist]);
 
-  const removeFromWishlistHandler = (data) =>{
+  const removeFromWishlistHandler = (data) => {
     setClick(!click);
     dispatch(removeFromwishlist(data));
-  }
+  };
 
-  const addToWishlistHandler = (data) =>{
+  const addToWishlistHandler = (data) => {
     setClick(!click);
     dispatch(addToWishlist(data));
-  }
+  };
 
-  const addToCartHandler = (id) =>{
+  const addToCartHandler = (id) => {
     const isItemExits = cart && cart.find((i) => i._id === id);
-    if(isItemExits){
-      toast.error("Item already in cart")
-    }else{
-      if(data.stock < 1){
-        toast.success("Product stock limited")
-      }else{
-        const cartData = {...data, qty: 1}
+    if (isItemExits) {
+      toast.error("Item already in cart");
+    } else {
+      if (data.stock < 1) {
+        toast.success("Product stock limited");
+      } else {
+        const cartData = { ...data, qty: 1 };
         dispatch(addTocart(cartData));
-        toast.success("Item added to cart successfully")
+        toast.success("Item added to cart successfully");
       }
     }
-  }
+  };
 
   return (
     <>
@@ -79,24 +82,20 @@ const ProductCart = ({ data }) => {
           </h4>
 
           <div className="flex">
-            <AiFillStar className="mr-2 cursor-pointer" color="yellow" />
-            <AiFillStar className="mr-2 cursor-pointer" color="yellow" />
-            <AiFillStar className="mr-2 cursor-pointer" color="yellow" />
-            <AiFillStar className="mr-2 cursor-pointer" color="yellow" />
-            <AiFillStar className="mr-2 cursor-pointer" color="yellow" />
+            <Ratings rating={data?.rating} />
+
           </div>
 
           <div className="py-2 flex items-center justify-between">
             <div className="flex">
               <h5 className={`${styles.productDiscountPrice}`}>
-                {data.price === 0 ? data.price : data.discount_price}$
+                {data.originalPrice === 0 ? data.originalPrice : data.discountPrice}$
               </h5>
               <h4 className={`${styles.price}`}>
-                {data.price ? data.price + " $" : null}
+                {data.originalPrice ? data.originalPrice + " $" : null}
               </h4>
             </div>
             <span className="font-[400] text-[17px] text-[#68d284]">
-              {data.total_sell} sold
               {data?.sold_out} sold
             </span>
           </div>

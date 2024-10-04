@@ -19,6 +19,7 @@ import {
   PaymentPage,
   OrderSuccessPage,
   OrderDetailsPage,
+  OrderTrackPage
 } from "./routes/Routes.js";
 
 import {
@@ -29,7 +30,9 @@ import {
   ShopAllEvents,
   ShopAllCoupouns,
   ShopAllOrders,
-  ShopOrdersDetails
+  ShopOrdersDetails,
+  ShopAllRefunds,
+  ShopSettingsPage
 } from "./routes/ShopRoutes.js";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -125,6 +128,14 @@ const App = () => {
                   </ProtectedRoute>
                 }
               />
+              <Route
+                path="/user/track/order/:id"
+                element={
+                  <ProtectedRoute isAuthenticated={isAuthenticated}>
+                    <OrderTrackPage />
+                  </ProtectedRoute>
+                }
+              />
               <Route path="/shop-create" element={<ShopCreatePage />} />
               <Route
                 path="/seller/activation/:activation_token"
@@ -139,6 +150,16 @@ const App = () => {
                   <SellerProtectedRoute isSeller={isSeller}>
                     <ShopHomePage />
                   </SellerProtectedRoute>
+                }
+              />
+              <Route
+                path="/settings"
+                element={
+                  //remember here use seller id like that :id current use 22
+
+                  // <SellerProtectedRoute isSeller={isSeller}>
+                    <ShopSettingsPage />
+                  // </SellerProtectedRoute>
                 }
               />
 
@@ -166,6 +187,15 @@ const App = () => {
                 path="/dashboard-orders"
                 element={
                   <ShopAllOrders />
+                  // <SellerProtectedRoute>
+
+                  // </SellerProtectedRoute>
+                }
+              />
+              <Route
+                path="/dashboard-refunds"
+                element={
+                  <ShopAllRefunds />
                   // <SellerProtectedRoute>
 
                   // </SellerProtectedRoute>

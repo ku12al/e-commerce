@@ -39,6 +39,24 @@ const OrderDetials = () => {
       });
   };
 
+  const refundOrderUpdateHandler = async () =>{
+    await axios
+      .put(
+        `${server}/order/update-refund-success/${id}`,
+        {
+          status,
+        },
+        { withCredentials: true }
+      )
+      .then((res) => {
+        toast.success("Refund successfully!");
+        dispatch(getAllOrdersOfShop(seller._id));
+      })
+      .catch((error) => {
+        toast.error(error.response.data.message);
+      });
+  }
+
   const data = orders && orders.find((item) => item._id === id);
   return (
     <div className={`py-4 min-h-screen ${styles.section}`}>
@@ -114,22 +132,14 @@ const OrderDetials = () => {
         <br />
         <br />
         <h4 className="pt-3 text-[20px] font-[600]">Order Status:</h4>
-        <select
-          value={status}
-          onChange={(e) => setStatus(e.target.value)}
-          id=""
-          className="w-[200px] mt-2 border h-[35px] rounded-[5px]"
-        >
-          {[
-            "Processing",
-            "Shipping",
-            "Delivered",
-            "Cancelled",
-            "Transferred to delivery partner",
-            "On the way",
-            "Received",
-          ]
-            .slice([
+        {data?.status !== "Processing refund" || data?.status !== "Refund success" && (
+          <select
+            value={status}
+            onChange={(e) => setStatus(e.target.value)}
+            id=""
+            className="w-[200px] mt-2 border h-[35px] rounded-[5px]"
+          >
+            {[
               "Processing",
               "Shipping",
               "Delivered",
@@ -137,17 +147,41 @@ const OrderDetials = () => {
               "Transferred to delivery partner",
               "On the way",
               "Received",
-            ])
+            ]
+              .slice([
+                "Processing",
+                "Shipping",
+                "Delivered",
+                "Cancelled",
+                "Transferred to delivery partner",
+                "On the way",
+                "Received",
+              ])
+              .map((option, index) => (
+                <option value={option} key={index}>
+                  {option}
+                </option>
+              ))}
+          </select>
+        )}
+
+        <select
+          value={status}
+          onChange={(e) => setStatus(e.target.value)}
+          id=""
+          className="w-[200px] mt-2 border h-[35px] rounded-[5px]"
+        >
+          {["Processing refund", "Refund success"]
+            .slice(["Processing refund", "Refund success"])
             .map((option, index) => (
               <option value={option} key={index}>
                 {option}
               </option>
             ))}
         </select>
-
         <div
           className={`${styles.button} mt-5 !bg-[#FCE1E6] !rounded-[4px] text-[#E94560] font-[600] !h-[45px] text-[18px]`}
-          onChange={orderUpdateHandler}
+          onClick={data?.status !== "Processing refund" ? orderUpdateHandler : refundOrderUpdateHandler}
         >
           Update Status
         </div>

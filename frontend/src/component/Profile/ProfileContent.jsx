@@ -288,18 +288,15 @@ const AllOrders = () => {
 };
 
 const AllRefundOrders = () => {
-  const orders = [
-    {
-      _id: "7463hvbfbhfbrtr28820221",
-      orderItems: [
-        {
-          name: "Iphone 14 pro max",
-        },
-      ],
-      totalPrice: 120,
-      orderStatus: "Processing",
-    },
-  ];
+  const {user} = useSelector((state)=> state.user);
+  const {orders} = useSelector((state)=> state.order);
+  const dispatch = useDispatch();
+
+  useEffect(()=>{
+    dispatch(getAllOrdersOfUser(user._id))
+  }, [])
+
+  const eligibleOrder = orders && orders.filter((item) => item.status === "Processing refund")
 
   const columns = [
     { field: "id", headerName: "Order ID", minWidth: 150, flex: 0.7 },
@@ -354,8 +351,8 @@ const AllRefundOrders = () => {
 
   const row = [];
 
-  orders &&
-    orders.forEach((item) => {
+  eligibleOrder &&
+    eligibleOrder.forEach((item) => {
       row.push({
         id: item._id,
         itemsQty: item.orderItems.length,
@@ -378,26 +375,13 @@ const AllRefundOrders = () => {
 };
 
 const TrackOrder = () => {
-  // const { user } = useSelector((state) => state.user);
-  // const { orders } = useSelector((state) => state.order);
-  // const dispatch = useDispatch();
+  const { user } = useSelector((state) => state.user);
+  const { orders } = useSelector((state) => state.order);
+  const dispatch = useDispatch();
 
-  // useEffect(() => {
-  //   dispatch(getAllOrdersOfUser(user._id));
-  // }, []);
-
-  const orders = [
-    {
-      _id: "7463hvbfbhfbrtr28820221",
-      orderItems: [
-        {
-          name: "Iphone 14 pro max",
-        },
-      ],
-      totalPrice: 120,
-      orderStatus: "Processing",
-    },
-  ];
+  useEffect(() => {
+    dispatch(getAllOrdersOfUser(user._id));
+  }, []);
 
   const columns = [
     { field: "id", headerName: "Order ID", minWidth: 150, flex: 0.7 },
@@ -457,10 +441,11 @@ const TrackOrder = () => {
       row.push({
         id: item._id,
         itemsQty: item.cart.length,
-        total: "US$ " + item.totalPrice,
+        total: "Rs. " + item.totalPrice,
         status: item.status,
       });
     });
+
 
   return (
     <div className="pl-8 pt-1">

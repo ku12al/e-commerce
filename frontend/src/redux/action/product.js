@@ -51,7 +51,7 @@ export const getAllProductsShop = (id) => async (dispatch) => {
 
     dispatch({
       type: GET_ALL_PRODUCTS_SHOP_SUCCESS,
-      payload: data.product,
+      payload: data.products,
     });
   } catch (error) {
     dispatch({
@@ -68,7 +68,7 @@ export const deleteProduct = (id) => async (dispatch) => {
 
     const { data } = await axios.delete(
       `${server}/product/delete-shop-product/${id}`,
-      { withCredentials: true }
+      // { withCredentials: true }
     );
 
     dispatch({
@@ -92,7 +92,7 @@ export const getAllProducts = () => async (dispatch) => {
 
     dispatch({
       type: GET_ALL_PRODUCTS_SUCCESS,
-      payload: data.product,
+      payload: data.allProduct,
     });
   } catch (error) {
     dispatch({

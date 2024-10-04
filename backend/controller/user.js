@@ -16,7 +16,7 @@ router.post("/create-user", upload.single("file"), async (req, res, next) => {
   try {
     const { email } = req.body;
     const userEmail = await User.findOne({ email: email });
-
+    console.log(userEmail)
     if (userEmail) {
       const filename = req.file.filename;
       const filePath = `uploads/${filename}`;
@@ -45,16 +45,20 @@ router.post("/create-user", upload.single("file"), async (req, res, next) => {
       avatar: fileUrl,
     };
 
+    console.log(user)
     const activationToken = createActivationToken(user);
 
+    console.log(activationToken)
     const activationUrl = `http://localhost:3000/activation/${activationToken}`;
 
     try {
+      console.log("aouon")
       await sendMail({
         email: user.email,
         subject: "Activation your account",
         text: `Hello ${user.name} please click on the link to activate your account ${activationUrl}`,
       });
+      console.log("aouon")
 
       res.status(201).json({
         success: true,

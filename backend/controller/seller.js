@@ -192,9 +192,10 @@ router.get("/logout", catchAsyncErrors(async (req, res, next) => {
 
 
 //get shop info
-router.get("/get-shop-info/:id", catchAsyncErrors(async (req, res, next) => {
+router.get("/get-shop-info/:id", isSeller, catchAsyncErrors(async (req, res, next) => {
   try{
     const shop = await Shop.findById(req.params.id);
+    console.log(shop)
     res.status(201).json({
       success: true,
       shop,

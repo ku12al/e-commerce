@@ -10,17 +10,17 @@ import Loader from '../Layout/Loader';
 const ShopInfo = ({ isOwner }) => {
   const { seller } = useSelector((state) => state.seller);
   const [data, setData] = useState({});
-  const { products } = useSelector((state) => state.products);
+  const {products} = useSelector((state) => state.products);
   const [isLoading, setIsLoading] = useState(false);
-  const { _id } = useParams();
+  const { id } = useParams();
   const dispatch = useDispatch();
   // console.log(seller)
   console.log(products)
 
   useEffect(() => {
-    dispatch(getAllProductsShop(_id));
+    // dispatch(getAllProductsShop(_id));
     setIsLoading(true);
-    axios.get(`${server}/shop/get-shop-info/${_id}`)
+    axios.get(`${server}/shop/get-shop-info/${id}`)
       .then((res) => {
         setData(res.data.shop);
         setIsLoading(false);
@@ -29,7 +29,7 @@ const ShopInfo = ({ isOwner }) => {
         console.error(error);
         setIsLoading(false);
       });
-  }, [dispatch, _id]);
+  }, []);
 
   const logoutHandler = async () => {
     await axios.get(`${server}/shop/logout`, { withCredentials: true });
