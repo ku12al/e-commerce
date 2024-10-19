@@ -45,10 +45,7 @@ router.post("/create-user", upload.single("file"), async (req, res, next) => {
       avatar: fileUrl,
     };
 
-    console.log(user)
     const activationToken = createActivationToken(user);
-
-    console.log(activationToken)
     const activationUrl = `http://localhost:3000/activation/${activationToken}`;
 
     try {
@@ -58,7 +55,6 @@ router.post("/create-user", upload.single("file"), async (req, res, next) => {
         subject: "Activation your account",
         text: `Hello ${user.name} please click on the link to activate your account ${activationUrl}`,
       });
-      console.log("aouon")
 
       res.status(201).json({
         success: true,
@@ -67,11 +63,9 @@ router.post("/create-user", upload.single("file"), async (req, res, next) => {
         // activationToken,
       });
     } catch (error) {
-      console.log("error 1");
       return next(new ErrorHandler(error.message, 500));
     }
   } catch (error) {
-    console.log("error 2");
     return next(new ErrorHandler(error.message, 400));
   }
 });
@@ -355,6 +349,8 @@ router.delete(
   })
 );
 
+
+//update user information 
 router.put(
   "/update-user-password",
   isAuthenticated,
@@ -363,22 +359,18 @@ router.put(
       // const { oldPassword } = req.body;
       // console.log(req.body);
       const user = await User.findById(req.user.id).select("+password");
-      console.log("huiewfw");
       const isPasswordValid = await user.comparePassword(req.body.oldPassword);
-      console.log("errorhe");
 
       if (!isPasswordValid) {
         return next(
           new ErrorHandler("Please provide the correct password", 400)
         );
       }
-      console.log("errorhe");
 
 
       // if(req.body.newPassword !== req.body.confirmPassword){
       //   return next(new ErrorHandler("Passwords do not match", 400));
       // }
-      console.log("errorhe");
 
 
       user.password = req.body.newPassword;
