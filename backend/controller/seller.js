@@ -195,7 +195,6 @@ router.get("/logout", catchAsyncErrors(async (req, res, next) => {
 router.get("/get-shop-info/:id", isSeller, catchAsyncErrors(async (req, res, next) => {
   try{
     const shop = await Shop.findById(req.params.id);
-    console.log(shop)
     res.status(201).json({
       success: true,
       shop,
@@ -204,5 +203,88 @@ router.get("/get-shop-info/:id", isSeller, catchAsyncErrors(async (req, res, nex
     return next(new ErrorHandler(error.message, 500));
   }
 }))
+
+//update user avatar
+router.put(
+  "/update-seller-avatar",
+  isSeller,
+  upload.single("image"),
+  catchAsyncErrors(async (req, res, next) => {
+    console.log("error");
+    try {
+      const existsSeller = await Shop.findById(req.seller._id);
+      // console.log(existsSeller);
+
+      const existAvatarPath = `${existsSeller.avatar}`;
+      console.log(existAvatarPath);
+
+      fs.access(existAvatarPath, fs.constants.F_OK, (err) => {
+        if (err) {
+          console.log("File does not exist:", existAvatarPath);
+        } else {
+          fs.unlink(existAvatarPath, (err) => {
+            if (err) {
+              console.error("Error deleting file:", err);
+            } else {
+              console.log("File deleted successfully.");
+            }
+          });
+        }
+      });
+
+      const fileUrl = path.join(req.file.filename);
+      // console.log(fileUrl);
+
+      const seller = await Shop.findByIdAndUpdate(req.seller._id, {
+        avatar: fileUrl,
+      });
+      // console.log(seller);
+
+      await seller.save();
+console.log("done")
+      res.status(200).json({
+        success: true,
+        seller,
+      });
+    } catch (error) {
+      return next(new ErrorHandler(error, 500));
+    }
+  })
+);
+
+//update user info
+router.put(
+  "/update-seller-info",
+  isSeller,
+  catchAsyncErrors(async (req, res) => {
+    console.log("error");
+    try {
+      const { name, description, address, phoneNumber, zipCode } = req.body;
+      // console.log(req.body);
+      // console.log(req.seller._id);
+      const seller = await Shop.findOne(req.seller._id)
+
+      // console.log(seller);
+      if (!seller) {
+        return next(new ErrorHandler("seller not found", 400));
+      }
+      console.log("sonow")
+      seller.name = name;
+      seller.description = description;
+      seller.address = address;
+      seller.phoneNumber = phoneNumber;
+      seller.zipCode = zipCode;
+      await seller.save();
+console.log("iowe")
+      res.status(201).json({
+        success: true,
+        seller,
+      });
+    } catch (error) {
+      console.log("ioowniewer")
+      return next(new ErrorHandler(error.message, 500));
+    }
+  })
+);
 
 module.exports = router;
