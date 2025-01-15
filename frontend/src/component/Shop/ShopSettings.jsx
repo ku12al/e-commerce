@@ -1,9 +1,214 @@
-import React from 'react'
+import React, { useState } from "react";
+import { AiOutlineCamera } from "react-icons/ai";
+import styles from "../../style/Style";
+import { backend_url, server } from "../../server";
+import { useDispatch, useSelector } from "react-redux";
+import axios from "axios";
+import { toast } from "react-toastify";
+import { loadSeller } from "../../redux/action/seller";
 
 const ShopSettings = () => {
-  return (
-    <div>ShopSettings</div>
-  )
-}
+  const { seller } = useSelector((state) => state.seller);
+  const [avatar, setAvatar] = useState();
+  const [name, setName] = useState(seller && seller.name);
+  const [description, setDescription] = useState(
+    seller && seller.description ? seller.description : ""
+  );
+  const [address, setAddress] = useState(seller && seller.address);
+  const [phoneNumber, setPhoneNumber] = useState(seller && seller.phoneNumber);
+  const [zipCode, setZipcode] = useState(seller && seller.zipCode);
 
-export default ShopSettings
+  const dispatch = useDispatch();
+  // console.log(seller);
+
+  const handleImage = async (e) => {
+    e.preventDefault();
+    // const reader = new FileReader();
+    // reader.onload = () => {
+    //   if(reader.readyState === 2){
+    //     setAvatar(reader.result);
+    //     axios.put(`${server}/shop/update-shop-avatar`, {avatar: reader.result}, {withCredentials:true,}).
+    //     then((res) => {
+    //       dispatch(loadSelle());
+    //       toast.success("Avatar updated successfully!")
+    //     }).catch((error) => {
+    //       toast.error(error.response.data.message);
+    //     })
+    //   }
+    // };
+    // reader.readAsDataURL(e.target.files[0]);
+    const file = e.target.files[0];
+    setAvatar(file);
+    console.log("noiwe")
+    const formData = new FormData();
+
+    formData.append("image", e.target.files[0]);
+    console.log("noiwe")
+    await axios
+      .put(`${server}/shop/update-seller-avatar`, formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+        withCredentials: true,
+      })
+      .then((res) => {
+        console.log("noiwe")
+        dispatch(loadSeller());
+        toast.success("Avatar updated successfully!");
+      })
+      .catch((error) => {
+        console.log("error")
+        toast.error(error.response.data.message);
+      });
+  };
+
+  const updateHandler = async (e) => {
+    e.preventDefault();
+
+    await axios
+      .put(
+        `${server}/shop/update-seller-info`,
+        {
+          name,
+          description,
+          address,
+          phoneNumber,
+          zipCode,
+          
+        },
+        {
+          withCredentials: true,
+        }
+      )
+      .then((res) => {
+        toast.success("shop info updated successfully");
+        dispatch(loadSeller());
+      })
+      .catch((error) => {
+        toast.error(error.response.data.message);
+      });
+  };
+  return (
+    <div className="w-full min-h-screen flex flex-col items-center">
+      <div className="flex w-full 800px:w-[80%] flex-col justify-center my-5">
+        <div className="w-full flex items-center justify-center">
+          <div className="relative">
+            <img
+              src={
+                avatar
+                  ? URL.createObjectURL(avatar)
+                  : `${backend_url}/${seller.avatar}`
+              }
+              alt=""
+              className="w-[200px] h-[200px] rounded-full cursor-pointer relative"
+            />
+            <div className="w-[30px] h-[30px] bg-[#E3E9EE] rounded-full flex items-center justify-center cursor-pointer absolute bottom-[10px] right-[15px]">
+              <input
+                type="file"
+                id="image"
+                className="hidden"
+                onChange={handleImage}
+              />
+              <label htmlFor="image">
+                <AiOutlineCamera />
+              </label>
+            </div>
+          </div>
+        </div>
+
+        {/* {shop Infor} */}
+
+        <form
+          aria-aria-required={true}
+          className="flex flex-col items-center cursor-pointer"
+          onSubmit={updateHandler}
+        >
+          <div className="w-[100%] flex items-center flex-col 800px:w-[50%] mt-5">
+            <div className="w-full pl-[3%]">
+              <label className="block pb-2">Shop Name</label>
+            </div>
+            <input
+              type="name"
+              placeholder={`${seller.name}`}
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              className={`${styles.input} !w-[95%] mb-4 800px:mb-0`}
+              required
+            />
+          </div>
+
+          <div className="w-[100%] flex items-center flex-col 800px:w-[50%] mt-5">
+            <div className="w-full pl-[3%]">
+              <label className="block pb-2"> Shop description</label>
+            </div>
+            <input
+              type="name"
+              placeholder={`${
+                seller?.description
+                  ? seller.description
+                  : "Enter your shop description"
+              }`}
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              className={`${styles.input} !w-[95%] mb-4 800px:mb-0`}
+            />
+          </div>
+
+          <div className="w-[100%] flex items-center flex-col 800px:w-[50%] mt-5">
+            <div className="w-full pl-[3%]">
+              <label className="block pb-2">Shop Address</label>
+            </div>
+            <input
+              type="name"
+              placeholder={seller?.address}
+              value={address}
+              onChange={(e) => setAddress(e.target.value)}
+              className={`${styles.input} !w-[95%] mb-4 800px:mb-0`}
+              required
+            />
+          </div>
+
+          <div className="w-[100%] flex items-center flex-col 800px:w-[50%] mt-5">
+            <div className="w-full pl-[3%]">
+              <label className="block pb-2">Shop Phone Number</label>
+            </div>
+            <input
+              type="number"
+              placeholder={seller?.phoneNumber}
+              value={phoneNumber}
+              onChange={(e) => setPhoneNumber(e.target.value)}
+              className={`${styles.input} !w-[95%] mb-4 800px:mb-0`}
+              required
+            />
+          </div>
+
+          <div className="w-[100%] flex items-center flex-col 800px:w-[50%] mt-5">
+            <div className="w-full pl-[3%]">
+              <label className="block pb-2">Shop Zip Code</label>
+            </div>
+            <input
+              type="number"
+              placeholder={seller?.zipCode}
+              value={zipCode}
+              onChange={(e) => setZipcode(e.target.value)}
+              className={`${styles.input} !w-[95%] mb-4 800px:mb-0`}
+              required
+            />
+          </div>
+
+          <div className="w-[100%] flex items-center flex-col 800px:w-[50%] mt-5 ">
+            <input
+              type="submit"
+              value="Update Shop"
+              className={`${styles.input} !w-[95%] mb-4 800px:mb-0 cursor-pointer`}
+              required
+              readOnly
+            />
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+};
+
+export default ShopSettings;

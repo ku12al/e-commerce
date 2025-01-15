@@ -8,6 +8,7 @@ export const loadSeller = () => async (dispatch) => {
     const { data } = await axios.get(`${server}/shop/getseller`, {
       withCredentials: true,
     });
+    console.log(data);
     dispatch({
       type: "loadSellerSuccess", // Match the type casing
       payload: data.seller

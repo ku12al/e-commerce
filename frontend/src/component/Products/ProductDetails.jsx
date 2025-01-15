@@ -8,16 +8,19 @@ import {
   AiOutlineMessage,
   AiOutlineShoppingCart,
 } from "react-icons/ai";
-import { backend_url } from "../../server";
+import { backend_url, server } from "../../server";
 import { getAllProductsShop } from "../../redux/action/product";
 import { addToWishlist, removeFromwishlist } from "../../redux/action/wishlist";
 import { addTocart } from "../../redux/action/cart";
 import { toast } from "react-toastify";
 import Ratings from "./Ratings";
+import axios from "axios";
 
 const ProductDetails = ({ data }) => {
   const { wishlist } = useSelector((state) => state.wishlist);
   const { cart } = useSelector((state) => state.cart);
+  const { user, isAuthenticated } = useSelector((state) => state.user);
+  const { seller } = useSelector((state) => state.seller);
   const { products } = useSelector((state) => state.products);
   const [count, setCount] = useState(1);
   const [click, setClick] = useState(false);
@@ -70,12 +73,36 @@ const ProductDetails = ({ data }) => {
     products &&
     products.reduce((acc, product) => acc + product.reviews.lenght, 0);
 
-    const totalRatings = products && products.reduce((acc, product) => acc + product.reviews.reduce((sum, review) => sum+review.rating, 0), 0)
+  const totalRatings =
+    products &&
+    products.reduce(
+      (acc, product) =>
+        acc + product.reviews.reduce((sum, review) => sum + review.rating, 0),
+      0
+    );
 
-    const averageRating = totalRatings / totalReviewsLength || 0;
+  const averageRating = totalRatings / totalReviewsLength || 0;
 
-  const handleMessageSubmit = () => {
-    navigate("/index?conversation=8939hnnksuehiwierb");
+  const handleMessageSubmit = async () => {
+    if (isAuthenticated) {
+      const groupTitle = data._id + user._id;
+      const userId = user._id;
+      const sellerId = data.shop._id;
+      await axios
+        .post(`${server}/conversation/create-new-conversation`, {
+          groupTitle,
+          userId,
+          sellerId,
+        })
+        .then((res) => {
+          navigate(`/conversation/${res.data.conversation._id}`);
+        })
+        .catch((err) => {
+          toast.error(err.response.data.message);
+        });
+    } else {
+      toast.error("please login to create a conversation");
+    }
   };
 
   return (
@@ -197,7 +224,9 @@ const ProductDetails = ({ data }) => {
                     <h3 className={`${styles.shop_name} pb-1 pt-1`}>
                       {data.shop.name}
                     </h3>
-                    <h5 className="pb-3 text-[15px]">({averageRating}/5) Ratings</h5>
+                    <h5 className="pb-3 text-[15px]">
+                      ({averageRating}/5) Ratings
+                    </h5>
                   </div>
 
                   <div
@@ -213,7 +242,12 @@ const ProductDetails = ({ data }) => {
             </div>
           </div>
 
-          <ProductDetailsInfo data={data} products={products} totalReviewsLength={totalReviewsLength} averageRating={averageRating}/>
+          <ProductDetailsInfo
+            data={data}
+            products={products}
+            totalReviewsLength={totalReviewsLength}
+            averageRating={averageRating}
+          />
           <br />
           <br />
         </div>
@@ -222,7 +256,12 @@ const ProductDetails = ({ data }) => {
   );
 };
 
-const ProductDetailsInfo = ({ data, products, totalReviewsLength, averageRating }) => {
+const ProductDetailsInfo = ({
+  data,
+  products,
+  totalReviewsLength,
+  averageRating,
+}) => {
   const [active, setActive] = useState(1);
   return (
     <div className="bg-[#eeeef3] px-3 800px:px-10 py-2 rounded">
@@ -310,7 +349,9 @@ const ProductDetailsInfo = ({ data, products, totalReviewsLength, averageRating 
                 />
                 <div className="pl-3">
                   <h3 className={`${styles.shop_name}`}>{data.shop.name}</h3>
-                  <h5 className="pb-2 text-[15px]">({averageRating}/5) Ratings</h5>
+                  <h5 className="pb-2 text-[15px]">
+                    ({averageRating}/5) Ratings
+                  </h5>
                 </div>
               </div>
             </Link>
@@ -334,7 +375,8 @@ const ProductDetailsInfo = ({ data, products, totalReviewsLength, averageRating 
                 </span>
               </h5>
               <h5 className="font-[600] pt-3">
-                Total Reviews: <span className="font-[500]">{totalReviewsLength}</span>
+                Total Reviews:{" "}
+                <span className="font-[500]">{totalReviewsLength}</span>
               </h5>
 
               <Link to="/">

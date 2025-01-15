@@ -19,7 +19,7 @@ import {
   PaymentPage,
   OrderSuccessPage,
   OrderDetailsPage,
-  OrderTrackPage
+  OrderTrackPage,
 } from "./routes/Routes.js";
 
 import {
@@ -32,12 +32,14 @@ import {
   ShopAllOrders,
   ShopOrdersDetails,
   ShopAllRefunds,
-  ShopSettingsPage
+  ShopSettingsPage,
+  ShopWithdrawMoneyPage,
+  ShopInboxPage
 } from "./routes/ShopRoutes.js";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import Store from "./redux/Store.js";
-import {loadUser } from "./redux/action/user";
+import { loadUser } from "./redux/action/user";
 import { loadSeller } from "./redux/action/seller.js";
 import { useSelector } from "react-redux";
 import ProtectedRoute from "./routes/ProtectedRoute.js";
@@ -49,14 +51,13 @@ import { getAllProducts } from "./redux/action/product.js";
 import { useState } from "react";
 import axios from "axios";
 import { server } from "./server.js";
-import { Elements } from '@stripe/react-stripe-js';
-import { loadStripe } from '@stripe/stripe-js';
+import { Elements } from "@stripe/react-stripe-js";
+import { loadStripe } from "@stripe/stripe-js";
 
 const App = () => {
   const [stripeApikey, setStripeApikey] = useState("");
 
-
-  async function getStripeApiKey(){
+  async function getStripeApiKey() {
     const { data } = await axios.get(`${server}/payment/stripeapikey`);
     setStripeApikey(data.stripeApikey);
   }
@@ -70,25 +71,24 @@ const App = () => {
     Store.dispatch(getAllEvents());
     getStripeApiKey();
 
-
     // if (isSeller === true) {
     //   return <Navigate to="/shop" replace />;
     // }
   }, []);
   return (
     <>
-      {loading || isLoading ? <Loader/> : (
+      {loading || isLoading ? (
+        <Loader />
+      ) : (
         <div className="App">
           <BrowserRouter>
-          {
-            stripeApikey && (
+            {stripeApikey && (
               <Elements stripe={loadStripe(stripeApikey)}>
                 <Routes>
-                <Route path="/payment" element={<PaymentPage />} />
+                  <Route path="/payment" element={<PaymentPage />} />
                 </Routes>
               </Elements>
-            )
-          }
+            )}
             <Routes>
               <Route path="/" element={<HomePage />} />
               <Route path="/login" element={<LoginPage />} />
@@ -102,13 +102,13 @@ const App = () => {
               <Route path="/best-selling" element={<BestSellingPage />} />
               <Route path="/events" element={<EventsPage />} />
               <Route path="/faq" element={<FAQPage />} />
-              <Route path="/order-success" element={<OrderSuccessPage/>} />
+              <Route path="/order-success" element={<OrderSuccessPage />} />
 
               <Route
                 path="/checkout"
                 element={
                   // <ProtectedRoute isAuthenticated={isAuthenticated}>
-                    <CheckoutPage />
+                  <CheckoutPage />
                   // </ProtectedRoute>
                 }
               />
@@ -158,7 +158,7 @@ const App = () => {
                   //remember here use seller id like that :id current use 22
 
                   // <SellerProtectedRoute isSeller={isSeller}>
-                    <ShopSettingsPage />
+                  <ShopSettingsPage />
                   // </SellerProtectedRoute>
                 }
               />
@@ -182,7 +182,7 @@ const App = () => {
                   // </SellerProtectedRoute>
                 }
               />
-              
+
               <Route
                 path="/dashboard-orders"
                 element={
@@ -231,8 +231,7 @@ const App = () => {
                 }
               />
 
-
-              <Route          
+              <Route
                 path="/dashboard-events"
                 element={
                   <ShopAllEvents />
@@ -242,7 +241,7 @@ const App = () => {
                 }
               />
 
-<Route          
+              <Route
                 path="/dashboard-coupouns"
                 element={
                   <ShopAllCoupouns />
@@ -250,6 +249,23 @@ const App = () => {
 
                   // </SellerProtectedRoute>
                 }
+              />
+
+              <Route
+                path="/dashboard-withdraw-money"
+                element={
+                  <ShopWithdrawMoneyPage />
+                  // <SellerProtectedRoute>
+
+                  // </SellerProtectedRoute>
+                }
+              />
+              <Route path="/dashboard-messages" element={
+                <ShopInboxPage />
+                // <SellerProtectedRoute>
+
+                // </SellerProtectedRoute>
+              }
               />
             </Routes>
 
