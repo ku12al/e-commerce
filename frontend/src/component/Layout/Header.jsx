@@ -17,6 +17,7 @@ import Cart from "../cart/Cart.jsx";
 import Wishlist from "../Wishlist/Wishlist.jsx";
 import { RxCross1 } from "react-icons/rx";
 import { backend_url } from "../../server.js";
+import { isSeller } from "../../../../backend/middleware/auth.js";
 
 /**
  * The `Header` component represents the header section of the application. It includes the following functionality:
@@ -36,9 +37,9 @@ import { backend_url } from "../../server.js";
  */
 const Header = ({ activeHeading }) => {
   const { isAuthenticated, user, loading } = useSelector((state) => state.user);
-  const { seller } = useSelector((state) => state.seller)
-  const { cart } = useSelector((state) => state.cart)
-  const {allProducts} = useSelector((state) => state.products)
+  const { seller } = useSelector((state) => state.seller);
+  const { cart } = useSelector((state) => state.cart);
+  const { allProducts } = useSelector((state) => state.products);
   const [searchData, setSearchData] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [active, setActive] = useState(false);
@@ -48,13 +49,12 @@ const Header = ({ activeHeading }) => {
   const [open, setOpen] = useState(false);
 
   const handleSearchChange = (e) => {
-    
     const term = e.target.value;
     setSearchTerm(term);
 
     const filteredProducts =
-    allProducts &&
-    allProducts.filter((product) =>
+      allProducts &&
+      allProducts.filter((product) =>
         product.name.toLowerCase().includes(term.toLowerCase())
       );
     setSearchData(filteredProducts);
@@ -117,7 +117,8 @@ const Header = ({ activeHeading }) => {
           <div className={`${styles.button} `}>
             <Link to="/shop-create">
               <h1 className="text-[#fff] flex items-center cursor-pointer">
-                {seller? "Go Dashboard": "Become Seller"}<IoIosArrowForward className="ml-1" />
+                {seller ? "Go Dashboard" : "Become Seller"}
+                <IoIosArrowForward className="ml-1" />
               </h1>
             </Link>
           </div>
@@ -249,7 +250,7 @@ const Header = ({ activeHeading }) => {
             <div className="relative mr-[20px]">
               <AiOutlineShoppingCart size={30} className="cursor-pointer" />
               <span className="absolute right-0 top-0 rounded-full bg-[#ff5a3d] w-4 h-4 right top p-0 m-0 text-white font-mono text-[12px] leading-tight text-center">
-              {cart && cart.length}
+                {cart && cart.length}
               </span>
             </div>
           </div>
@@ -314,9 +315,10 @@ const Header = ({ activeHeading }) => {
                 <Navbar active={activeHeading} />
               </div>
               <div className={`${styles.button} ml-4 !rounded-[4px] `}>
-                <Link to="/shop-create">
+                <Link to={`${isSeller ? "/dashboard" : "/shop-create"}`}>
                   <h1 className="text-[#fff] flex items-center">
-                    Become Seller <IoIosArrowForward className="ml-1" />
+                    {isSeller ? "Go Dashboard" : "Become Seller"}
+                    <IoIosArrowForward className="ml-1" />
                   </h1>
                 </Link>
               </div>

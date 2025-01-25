@@ -5,7 +5,7 @@ const Shop = require("../model/shop");
 const Event = require("../model/event");
 const upload = require("../multer");
 const ErrorHandler = require("../utils/ErrorHandler");
-const { isSeller } = require("../middleware/auth");
+const { isSeller, isAuthenticated, isAdmin } = require("../middleware/auth");
 
 
 
@@ -18,7 +18,7 @@ router.post(
           const shop = await Shop.findById(shopId);
     
           if (!shop) {
-            return next(new ErrorHandler("shop Id is invalid"));
+            return next(new ErrorHandler("shop Id is invalid", 400));
           } else {
             const files = req.files;
 
@@ -112,6 +112,23 @@ router.delete(
     }
   })
 );
+
+//all events for admin
+router.get("/admin-all-events", isAuthenticated, isAdmin("Admin"), catchAsyncError(async(req, res, next)=>{
+  try{
+    const events = await Event.find().sort({
+      createAt: -1,
+    });
+    res.status(201).json({
+      success: true,
+      events,
+    })
+
+  }catch(error){
+    return next(new ErrorHandler(error.message, 500));
+  }
+})
+)
 
 
 module.exports = router;

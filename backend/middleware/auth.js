@@ -31,3 +31,12 @@ exports.isAuthenticated = catchAsyncErrors(async(req,res,next) => {
 
     next();
 });
+
+exports.isAdmin = (...roles) => {
+    return (req, res, next) => {
+        if(!roles.indludes(req.user.role)){
+            return next(new ErrorHandler(`$(req.user.role) can not access this resource!`))
+        }
+        next();
+    }
+}

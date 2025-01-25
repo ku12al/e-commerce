@@ -25,10 +25,10 @@ const DashboardHero = () => {
             setDeliveredOrder(orderData);
       },[dispatch])
 
-      const totalEarningEithoutTax = deliveredOrder && deliveredOrder.reduce((acc, item) => acc + item.totalPrice, 0);
+      const totalEarningEithoutTax = deliveredOrder ? deliveredOrder.reduce((acc, item) => acc + item.totalPrice, 0) : 0;
 
-      const serviceCharge = totalEarningEithoutTax + 0.1;
-      const availableBalance = totalEarningEithoutTax - serviceCharge.toFixed(2);
+      const serviceCharge = totalEarningEithoutTax ? totalEarningEithoutTax * 0.1 : 0;
+      const availableBalance = totalEarningEithoutTax - serviceCharge.toFixed(2) || 0;
   return (
     <div className="w-full p-8">
       <h3 className="text-[22px] font-Poppins pb-2">Overview</h3>

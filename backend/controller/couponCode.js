@@ -3,6 +3,7 @@ const { isSeller } = require("../middleware/auth");
 const catchAsyncError = require("../middleware/catchAsyncError");
 const ErrorHandler = require("../utils/ErrorHandler");
 const CoupounCode = require("../model/coupounCode");
+const coupounCode = require("../model/coupounCode");
 const router = express.Router();
 
 router.post(
@@ -14,7 +15,7 @@ router.post(
         name: req.body.name,
       });
 
-      if (isCouponCodeExists !== 0) {
+      if (isCouponCodeExists.length !== 0) {
         return next(new ErrorHandler("Coupoun code already exists", 400));
       }
 
@@ -36,11 +37,7 @@ router.get(
   isSeller,
   catchAsyncError(async (req, res, next) => {
     try {
-      const coupounCodes = await CoupounCode.find({
-        shop: {
-          _id: req.params.id,
-        },
-      });
+      const coupounCodes = await CoupounCode.find({ shopId: req.seller.id });
       res.status(201).json({
         success: true,
         coupounCodes,
@@ -50,6 +47,26 @@ router.get(
     }
   })
 );
+
+
+//delete coupon code of a shop
+router.delete("/delete-coupon/:id", isSeller, catchAsyncError(async(req, res, next) => {
+  try{
+    const couponCode = await CoupounCode.findByIdAndDelete(req.params.id);
+
+    if(!couponCode){
+      return next(new ErrorHandler("Coupoun code dosn't exists!", 400));
+    }
+
+    res.status(201).json({
+      success: true,
+      message: "Coupoun code deleted successfully"
+    })
+
+  }catch(error){
+    return next(new ErrorHandler(error, 400));
+  }
+}))
 
 router.get("/get-coupon-value/:name", catchAsyncError(async (req, res, next) =>{
   try {

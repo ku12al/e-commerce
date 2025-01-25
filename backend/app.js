@@ -33,6 +33,7 @@ const coupon = require("./controller/couponCode")
 const payment = require("./controller/payment")
 const order = require("./controller/order")
 const conversation = require("./controller/conversation")
+// const message = require("./controller/messages")
 
 
 app.use("/user",user);
@@ -43,6 +44,7 @@ app.use("/coupon", coupon);
 app.use("/payment", payment)
 app.use("/order", order);
 app.use("/conversation", conversation);
+// app.use("/message", message)
 
 
 

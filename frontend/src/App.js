@@ -20,6 +20,7 @@ import {
   OrderSuccessPage,
   OrderDetailsPage,
   OrderTrackPage,
+  userInbox
 } from "./routes/Routes.js";
 
 import {
@@ -103,6 +104,8 @@ const App = () => {
               <Route path="/events" element={<EventsPage />} />
               <Route path="/faq" element={<FAQPage />} />
               <Route path="/order-success" element={<OrderSuccessPage />} />
+              <Route path="/inbox" element={<userInbox />} />
+
 
               <Route
                 path="/checkout"
