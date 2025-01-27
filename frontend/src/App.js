@@ -1,6 +1,6 @@
 import "./App.css";
 import React, { useEffect } from "react";
-import { Navigate, BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 import {
   LoginPage,
   SignupPage,
@@ -31,6 +31,7 @@ import {
   ShopAllEvents,
   ShopAllCoupouns,
   ShopAllOrders,
+  ShopPreviewPage,
   ShopOrdersDetails,
   ShopAllRefunds,
   ShopSettingsPage,
@@ -139,6 +140,7 @@ const App = () => {
                   </ProtectedRoute>
                 }
               />
+              <Route path="/shop/preview/:id" element={<ShopPreviewPage />} />
               <Route path="/shop-create" element={<ShopCreatePage />} />
               <Route
                 path="/seller/activation/:activation_token"
@@ -146,7 +148,7 @@ const App = () => {
               />
               <Route path="/shop-login" element={<ShopLoginPage />} />
               <Route
-                path="/shop/:_id"
+                path="/shop/:id"
                 element={
                   //remember here use seller id like that :id current use 22
 

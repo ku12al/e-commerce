@@ -6,7 +6,7 @@ const router = express.Router();
 const { isAuthenticated, isSeller } = require("../middleware/auth");
 const conversation = require("../model/conversation");
 router.post(
-  "/create-now-conversation",
+  "/create-new-conversation",
   catchAsyncError(async (req, res, next) => {
     try {
       const { groupTitle, userId, sellerId } = req.body;
