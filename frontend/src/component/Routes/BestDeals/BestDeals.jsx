@@ -6,7 +6,7 @@ import ProductCart from "../ProductCart/ProductCart";
 const BestDeals = () => {
   const [data, setData] = useState([]);
   const { allProducts } = useSelector((state) => state.products);
-  // console.log(allProducts);
+  console.log(allProducts);
   useEffect(() => {
     const allProductsData = allProducts ? [...allProducts] : [];
     const sortedData = allProductsData?.sort((a,b) => b.sold_out - a.sold_out); 

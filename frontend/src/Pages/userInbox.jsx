@@ -9,7 +9,7 @@ import { useNavigate } from "react-router-dom";
 const ENDPOINT = "https://localhost:4000/";
 const socketId = socketIO(ENDPOINT, { transports: ["websocket"] });
 
-const userInbox = () => {
+const UserInbox = () => {
   const { user, isAuthenticated } = useSelector((state) => state.user);
   const [conversations, setConversations] = useState([]);
   const [open, setOpen] = useState(false);
@@ -145,9 +145,10 @@ const userInbox = () => {
 
   return (
     <div className="w-full">
-      <Header />
+      
       {!open && (
         <>
+          <Header />
           <h1 className="text-center text-[30px] py-3 font-Poppins">
             All Messages
           </h1>
@@ -160,7 +161,7 @@ const userInbox = () => {
                 index={index}
                 setOpen={setOpen}
                 setCurrentChat={setCurrentChat}
-                me={seller._id}
+                me={user._id}
                 userData={userData}
                 setUserData={setUserData}
                 online={onlineCheck(item)}
@@ -240,4 +241,4 @@ const MessageList = ({
     </div>
   );
 };
-export default userInbox;
+export default UserInbox;

@@ -17,7 +17,6 @@ import Cart from "../cart/Cart.jsx";
 import Wishlist from "../Wishlist/Wishlist.jsx";
 import { RxCross1 } from "react-icons/rx";
 import { backend_url } from "../../server.js";
-import { isSeller } from "../../../../backend/middleware/auth.js";
 
 /**
  * The `Header` component represents the header section of the application. It includes the following functionality:
@@ -37,8 +36,9 @@ import { isSeller } from "../../../../backend/middleware/auth.js";
  */
 const Header = ({ activeHeading }) => {
   const { isAuthenticated, user, loading } = useSelector((state) => state.user);
-  const { seller } = useSelector((state) => state.seller);
+  const { isSeller } = useSelector((state) => state.seller);
   const { cart } = useSelector((state) => state.cart);
+  const { wishlist } = useSelector((state) => state.wishlist);
   const { allProducts } = useSelector((state) => state.products);
   const [searchData, setSearchData] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
@@ -48,6 +48,7 @@ const Header = ({ activeHeading }) => {
   const [openWishlist, setOpenWishlist] = useState(false);
   const [open, setOpen] = useState(false);
 
+  console.log(allProducts);
   const handleSearchChange = (e) => {
     const term = e.target.value;
     setSearchTerm(term);
@@ -71,7 +72,7 @@ const Header = ({ activeHeading }) => {
     <>
       <div className={`${styles.section}`}>
         <div className="hidden 800px:h-[50px] 800px:my-[20px] 800px:flex items-center justify-between">
-          <div className="w-25 my-6 animate-pulse items-center">
+          <div>
             <Link to="/">
               <h1 className="font-extrabold flex text-[#9cef4e] text-4xl">
                 QuirkyCart
@@ -96,12 +97,12 @@ const Header = ({ activeHeading }) => {
             {searchData && searchData.length !== 0 ? (
               <div className="absolute min-h-[30vh] bg-slate-50 shadow-sm-2 z-[9] p-4">
                 {searchData &&
-                  searchData.map((i) => {
+                  searchData.map((i, index) => {
                     return (
                       <Link to={`/product/${i._id}`}>
                         <div className="w-full flex items-start-py-3">
                           <img
-                            src={`${backend_url}${i.images[0]}`}
+                            src={`${i.images[0]?.url}`}
                             alt=""
                             className="w-[40px] h-[40px] mr-[10px]"
                           />
@@ -115,9 +116,9 @@ const Header = ({ activeHeading }) => {
           </div>
 
           <div className={`${styles.button} `}>
-            <Link to="/shop-create">
+            <Link to={`${isSeller ? "/dashboard" : "/shop-create"}`}>
               <h1 className="text-[#fff] flex items-center cursor-pointer">
-                {seller ? "Go Dashboard" : "Become Seller"}
+                {isSeller ? "Go Dashboard" : "Become Seller"}
                 <IoIosArrowForward className="ml-1" />
               </h1>
             </Link>
@@ -161,63 +162,64 @@ const Header = ({ activeHeading }) => {
             <Navbar active={activeHeading} />
           </div>
 
-          <div className={`${styles.noramlFlex} flex`}>
-            <div
-              className="relative cursor-pointer mr-[15px]"
-              onClick={() => setOpenWishlist(true)}
-            >
-              <AiOutlineHeart size={30} color="rgb(255 255 255 / 83%)" />
-              <span className="absolute right-0 top-0 rounded-full bg-[#ff5a3d] w-4 h-4 right top p-0 m-0 text-white font-mono text-[12px] leading-tight text-center">
-                0
-              </span>
+          <div className="flex">
+            <div className={`${styles.noramlFlex}`}>
+              <div
+                className="relative cursor-pointer mr-[15px]"
+                onClick={() => setOpenWishlist(true)}
+              >
+                <AiOutlineHeart size={30} color="rgb(255 255 255 / 83%)" />
+                <span className="absolute right-0 top-0 rounded-full bg-[#ff5a3d] w-4 h-4 right top p-0 m-0 text-white font-mono text-[12px] leading-tight text-center">
+                  {wishlist && wishlist.length}
+                </span>
+              </div>
             </div>
 
-            <div
-              className="relative cursor-pointer mr-[15px]"
-              onClick={() => setOpenCart(true)}
-            >
-              <AiOutlineShoppingCart size={30} color="rgb(255 255 255 / 83%)" />
-              <span className="absolute right-0 top-0 rounded-full bg-[#ff5a3d] w-4 h-4 right top p-0 m-0 text-white font-mono text-[12px] leading-tight text-center">
-                {cart && cart.length}
-              </span>
+            <div className={`${styles.noramlFlex}`}>
+              <div
+                className="relative cursor-pointer mr-[15px]"
+                onClick={() => setOpenCart(true)}
+              >
+                <AiOutlineShoppingCart
+                  size={30}
+                  color="rgb(255 255 255 / 83%)"
+                />
+                <span className="absolute right-0 top-0 rounded-full bg-[#ff5a3d] w-4 h-4 right top p-0 m-0 text-white font-mono text-[12px] leading-tight text-center">
+                  {cart && cart.length}
+                </span>
+              </div>
             </div>
 
-            <div className="flex w-full justify-center">
-              {loading ? (
-                <div>Loading...</div>
-              ) : isAuthenticated ? (
-                <div>
-                  <Link to="/profile">
-                    {user && user.avatar && (
-                      <img
-                        src={`${backend_url}/${user.avatar}`}
-                        alt=""
-                        className="w-[60px] h-[60px] rounded-full border-[3px] border-[#0eae88]"
-                      />
-                    )}
-                  </Link>
-                </div>
-              ) : (
-                <>
-                  <Link
-                    to="/login"
-                    className="text-[18px] pr-[10px] text-[#000000b7]"
-                  >
-                    Login /
-                  </Link>
-                  <Link to="/sign-up" className="text-[18px] text-[#000000b7]">
-                    Sign up
-                  </Link>
-                </>
-              )}
+            <div className={`${styles.noramlFlex}`}>
+              <div className="relative cursor-pointer">
+                {isAuthenticated ? (
+                    <Link to="/profile">
+                      {user && user.avatar && (
+                        <img
+                          src={`${user?.avatar?.url}`}
+                          alt=""
+                          className="w-[50px] h-[50px] rounded-full border-[3px] border-[#0eae88]"
+                        />
+                      )}
+                    </Link>
+                ) : (
+                    <Link
+                      to="/login"
+                    >
+                      <CgProfile size={30} color="rgb(255 255 255 / 83%)" />
+                    </Link>
+                )}
+              </div>
             </div>
+
+            {/* cart popup */}
+            {openCart ? <Cart setOpenCart={setOpenCart} /> : null}
+
+            {/* cart popup */}
+            {openWishlist ? (
+              <Wishlist setOpenWishlist={setOpenWishlist} />
+            ) : null}
           </div>
-
-          {/* cart popup */}
-          {openCart ? <Cart setOpenCart={setOpenCart} /> : null}
-
-          {/* cart popup */}
-          {openWishlist ? <Wishlist setOpenWishlist={setOpenWishlist} /> : null}
         </div>
       </div>
 

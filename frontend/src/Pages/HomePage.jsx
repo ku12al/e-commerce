@@ -19,7 +19,6 @@ const HomePage = () => {
       <FeaturedProduct/>
       <Sponsored/>
       <Footer/>
-
     </div>
   )
 }

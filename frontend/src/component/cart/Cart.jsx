@@ -11,10 +11,12 @@ import { toast } from "react-toastify";
 
 const Cart = ({ setOpenCart }) => {
   const { cart } = useSelector((state) => state.cart);
+  console.log(cart);
   const dispatch = useDispatch();
 
   const removeFromCartHandler = (data) => {
     dispatch(removeFromCart(data));
+    console.log(data)
   };
 
   const totalPrice = cart.reduce(
@@ -36,8 +38,8 @@ const Cart = ({ setOpenCart }) => {
                 className="cursor-pointer"
                 onClick={() => setOpenCart(false)}
               />
-              <h5>Cart Item is empty</h5>
             </div>
+            <h5>Cart Item is empty</h5>
           </div>
         ) : (
           <>
@@ -70,7 +72,7 @@ const Cart = ({ setOpenCart }) => {
               </div>
             </div>
 
-            <div>
+            <div className="px-5 mb-3">
               {/* checkout buttons */}
               <Link to="/checkout">
                 <div
@@ -90,7 +92,7 @@ const Cart = ({ setOpenCart }) => {
 };
 
 const CartSingle = ({ data, quantityChangeHandler, removeFromCartHandler }) => {
-  const [value, setValue] = useState(1);
+  const [value, setValue] = useState(data.qty);
   const totalPrice = data.discountPrice * value;
 
   const increment = (data) => {
@@ -128,8 +130,8 @@ const CartSingle = ({ data, quantityChangeHandler, removeFromCartHandler }) => {
           </div>
         </div>
         <img
-          src={`${backend_url}${data?.images[0]}`}
-          alt=""
+          src={data.image_Url?.[0]?.url || "/placeholder.jpg"}
+          alt={data.name}
           className="w-[130px] h-min ml-2 mr-2 rounded-[5px]"
         />
 

@@ -196,6 +196,7 @@ const MessageList = ({
   userData,
   online,
   setUserData,
+  setActiveStatus
 }) => {
   const navigate = useNavigate();
   const handleClick = (id) => {

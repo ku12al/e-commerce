@@ -18,7 +18,6 @@ const Store = configureStore({
     wishlist: wishlistReducer,
     order: orderReducer,
   },
-  devTools: process.env.NODE_ENV !== 'production',
 });
 
 export default Store;
