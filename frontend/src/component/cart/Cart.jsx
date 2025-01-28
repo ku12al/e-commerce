@@ -11,12 +11,10 @@ import { toast } from "react-toastify";
 
 const Cart = ({ setOpenCart }) => {
   const { cart } = useSelector((state) => state.cart);
-  console.log(cart);
   const dispatch = useDispatch();
 
   const removeFromCartHandler = (data) => {
     dispatch(removeFromCart(data));
-    console.log(data)
   };
 
   const totalPrice = cart.reduce(
