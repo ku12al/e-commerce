@@ -4,14 +4,14 @@ import { server } from "../../server";
 // load seller
 export const loadSeller = () => async (dispatch) => {
   try {
-    dispatch({ type: "loadSellerRequest" }); // Match the type casing
+    dispatch({ type: "loadSellerRequest", }); // Match the type casing
     const { data } = await axios.get(`${server}/shop/getseller`, {
       withCredentials: true,
     });
     console.log(data);
     dispatch({
       type: "loadSellerSuccess", // Match the type casing
-      payload: data.seller
+      payload: data.seller,
     });
   } catch (error) {
     dispatch({

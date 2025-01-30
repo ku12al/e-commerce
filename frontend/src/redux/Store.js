@@ -8,7 +8,7 @@ import {eventReducer} from "./reducer/event";
 import {orderReducer} from "./reducer/order";
 
 
-const Store = configureStore({
+const store = configureStore({
   reducer: {
     user: userReducer,
     seller: sellerReducer,
@@ -20,4 +20,4 @@ const Store = configureStore({
   },
 });
 
-export default Store;
+export default store;

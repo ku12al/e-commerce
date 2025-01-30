@@ -17,13 +17,16 @@ const DashboardHero = () => {
       const [deliveredOrder, setDeliveredOrder] = useState(null);
       console.log(products)
 
-      useEffect(()=>{
-            dispatch(getAllOrdersOfShop(seller._id));
-            dispatch(getAllProductsShop(seller._id));
-
-            const orderData = orders && orders.filter((item) => item.status === "Delivered");
-            setDeliveredOrder(orderData);
-      },[dispatch])
+      useEffect(() => {
+        if (seller && seller._id) {  // Check if seller and seller._id exist
+          dispatch(getAllOrdersOfShop(seller._id));
+          dispatch(getAllProductsShop(seller._id));
+      
+          const orderData = orders && orders.filter((item) => item.status === "Delivered");
+          setDeliveredOrder(orderData);
+        }
+      }, [dispatch, seller, orders]);
+      
 
       const totalEarningEithoutTax = deliveredOrder ? deliveredOrder.reduce((acc, item) => acc + item.totalPrice, 0) : 0;
 

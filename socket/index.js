@@ -21,12 +21,11 @@ app.get("/", (req, res) => {
 let users = [];
 
 const addUser = (userId, socketId) => {
-  !users.some((user) => users.userId === userId) &&
+  !users.some((user) => user.userId === userId) &&
     users.push({ userId, socketId });
 };
-
 const removeUser = (socketId) => {
-  users = users.filter((user) => user.sockeId !== socketId);
+  users = users.filter((user) => user.socketId !== socketId);
 };
 
 const getUser = (receiverId) => {
@@ -75,7 +74,7 @@ io.on("connection", (socket) => {
     if (messages[senderId]) {
       const message = messages[senderId].find(
         (message) =>
-          messages.receiverId === receiverId && message.id === messageId
+          message.receiverId === receiverId && message.id === messageId
       );
       if (message) {
         message.seen = true;
@@ -106,6 +105,6 @@ io.on("connection", (socket) => {
   });
 });
 
-app.listen(process.env.PORT, () => {
+server.listen(process.env.PORT, () => {
   console.log(`server listening on port ${process.env.PORT}`);
 });
