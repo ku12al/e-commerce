@@ -81,8 +81,9 @@ const UserInbox = () => {
   useEffect(() => {
     const getMessage = async () => {
       try {
+        console.log(currentChat);
         const response = await axios.get(
-          `${server}/message/get-all-messages/${currentChat?._id}`
+          `${server}/messages/get-all-messages/${currentChat?._id}`
         );
         setMessages(response.data.messages);
       } catch (error) {
@@ -97,9 +98,9 @@ const UserInbox = () => {
     e.preventDefault();
 
     const message = {
+      conversationId: currentChat._id,
       sender: user._id,
       text: newMessage,
-      conversationId: currentChat._id,
     };
     const receiverId = currentChat.members.find(
       (member) => member !== user?._id
@@ -114,7 +115,7 @@ const UserInbox = () => {
     try {
       if (newMessage !== "") {
         await axios
-          .post(`${server}/message/create-new-message`, message)
+          .post(`${server}/messages/create-new-message`, message)
           .then((res) => {
             setMessages([...messages, res.data.message]);
             updateLastMessage();

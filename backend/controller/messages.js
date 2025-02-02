@@ -13,11 +13,11 @@ router.post(
     try {
       const messageData = req.body;
 
-      if (req.files) {
-        const files = req.files;
-        const imageUrls = files.map((file) => `${file.filename}`);
-        messageData.images = imageUrls;
-      }
+      // if (req.files) {
+      //   const files = req.files;
+      //   const imageUrls = files.map((file) => `${file.filename}`);
+      //   messageData.images = imageUrls;
+      // }
 
       messageData.conversationId = req.body.conversationId;
       messageData.sender = req.body.sender;
@@ -27,7 +27,7 @@ router.post(
         conversationId: messageData.conversationId,
         text: messageData.text,
         sender: messageData.sender,
-        images: messageData.images ? messageData.images : undefined,
+        // images: messageData.images ? messageData.images : undefined,
       });
 
       await message.save();

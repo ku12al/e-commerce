@@ -12,7 +12,7 @@ const conversationSchema = new mongoose.Schema({
       },
       lastMessageId:{
             type: String,
-      }
+      },
 },
 {timestamps: true}
 );

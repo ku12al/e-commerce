@@ -62,7 +62,7 @@ router.get(
   catchAsyncError(async (req, res, next) => {
     try {
       const conversations = await Conversation.find({
-        memebers: {
+        members: {
           $in: [req.params.id],
         },
       }).sort({ updateAt: -1, createAt: -1 });

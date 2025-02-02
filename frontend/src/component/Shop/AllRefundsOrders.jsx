@@ -9,7 +9,7 @@ import Loader from "../Layout/Loader";
 import { getAllOrdersOfShop } from "../../redux/action/order";
 
 const AllRefundsOrders = () => {
-  const { orders, isLoading } = useSelector((state) => state.orders);
+  const { orders, isLoading } = useSelector((state) => state.order);
   const { seller } = useSelector((state) => state.seller);
   const dispatch = useDispatch();
 
