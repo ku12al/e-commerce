@@ -16,9 +16,9 @@ const ShopInfo = ({ isOwner }) => {
   const dispatch = useDispatch();
   // console.log(seller)
   console.log(products)
-
+  console.log(id)
   useEffect(() => {
-    // dispatch(getAllProductsShop(_id));
+    dispatch(getAllProductsShop(id));
     setIsLoading(true);
     axios.get(`${server}/shop/get-shop-info/${id}`)
       .then((res) => {
@@ -36,10 +36,13 @@ const ShopInfo = ({ isOwner }) => {
     window.location.reload();
   };
 
-  const totalReviewsLength = products?.reduce((acc, product) => acc + (product.reviews?.length || 0), 0) || 0;
-  const totalRatings = products?.reduce((acc, product) => acc + (product.reviews?.reduce((sum, review) => sum + review.rating, 0) || 0), 0) || 0;
-  const averageRating = totalRatings / (totalReviewsLength || 1); // To avoid division by zero
+  const totalReviewsLength =
+    products &&
+    products.reduce((acc, product) => acc + product.reviews.length, 0);
 
+  const totalRatings = products && products.reduce((acc,product) => acc + product.reviews.reduce((sum,review) => sum + review.rating, 0),0);
+
+  const averageRating = totalRatings / totalReviewsLength || 0;
   return (
     <>
       {isLoading ? (

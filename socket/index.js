@@ -21,12 +21,22 @@ app.get("/", (req, res) => {
 let users = [];
 
 const addUser = (userId, socketId) => {
-  !users.some((user) => user.userId === userId) &&
+  console.log(`User ${userId} connected with socket ID: ${socketId}`);
+  if (!users.some((user) => user.userId === userId)) {
     users.push({ userId, socketId });
+  } else {
+    // Update socket ID if the user already exists
+    users = users.map((user) =>
+      user.userId === userId ? { userId, socketId } : user
+    );
+  }
 };
+
 const removeUser = (socketId) => {
+  console.log(`Removing user with socket ID: ${socketId}`);
   users = users.filter((user) => user.socketId !== socketId);
 };
+
 
 const getUser = (receiverId) => {
   return users.find((user) => user.userId === receiverId);
@@ -54,33 +64,40 @@ io.on("connection", (socket) => {
   //send and get message
   const messages = {};
   socket.on("sendMessage", ({ senderId, receiverId, text, images }) => {
+    console.log(`Message from ${senderId} to ${receiverId}: ${text}`);
+  
     const message = createMessage({ senderId, receiverId, text, images });
-
+  
     const user = getUser(receiverId);
-
-    //store the messages in the 'messages' object
+  
     if (!messages[receiverId]) {
       messages[receiverId] = [message];
     } else {
       messages[receiverId].push(message);
     }
-
-    io.to(user?.sockeId).emit("getMessage", message);
+  
+    if (user) {
+      io.to(user.socketId).emit("getMessage", message);
+    } else {
+      console.log(`User ${receiverId} not found online`);
+    }
   });
-
+  
   socket.on("messageSeen", ({ senderId, receiverId, messageId }) => {
-    const user = getUser(senderId);
-
-    if (messages[senderId]) {
-      const message = messages[senderId].find(
-        (message) =>
-          message.receiverId === receiverId && message.id === messageId
-      );
-      if (message) {
-        message.seen = true;
-
-        //send a message seen event
-        io.to(user?.socketId).emit("messageSeen", {
+    console.log(`Message seen event received for ${messageId}`);
+  
+    if (!messages[senderId]) return;
+  
+    const message = messages[senderId].find(
+      (msg) => msg.receiverId === receiverId && msg.id === messageId
+    );
+  
+    if (message) {
+      message.seen = true;
+  
+      const user = getUser(senderId);
+      if (user) {
+        io.to(user.socketId).emit("messageSeen", {
           senderId,
           receiverId,
           messageId,
@@ -88,7 +105,7 @@ io.on("connection", (socket) => {
       }
     }
   });
-
+  
   //update and get last message
   socket.on("updateLastMessage", ({ lastMessage, lastMessageId }) => {
     io.emit("getLastMessage", {
@@ -105,6 +122,9 @@ io.on("connection", (socket) => {
   });
 });
 
-server.listen(process.env.PORT, () => {
-  console.log(`server listening on port ${process.env.PORT}`);
+server.listen(process.env.PORT || 5000, () => {
+  console.log(`Server listening on port ${process.env.PORT}`);
+}).on("error", (err) => {
+  console.error("Server error:", err);
 });
+

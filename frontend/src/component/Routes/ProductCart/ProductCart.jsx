@@ -64,9 +64,9 @@ const ProductCart = ({ data, isEvent }) => {
     <>
       <div className="w-full h-[370px] bg-white rounded-lg shadow-md p-3 relative cursor-pointer">
         <div className="flex justify-end"></div>
-        <Link to={`${isEvent === true ?`/product/${data._id}?isEvent=true`:`/product/${data._id}`}`}>
+        <Link to={`${isEvent === true ?`/product/${data._id} ? isEvent=true`:`/product/${data._id}`}`}>
           <img
-            src={`${backend_url}${data.images && data.images[0]}`}
+            src={`${data.images && data.images[0]?.url}`}
             alt=""
             className="w-full h-[170px] object-contain"
           />
@@ -82,7 +82,7 @@ const ProductCart = ({ data, isEvent }) => {
           </h4>
 
           <div className="flex">
-            <Ratings rating={data?.rating} />
+            <Ratings rating={data?.ratings} />
 
           </div>
 

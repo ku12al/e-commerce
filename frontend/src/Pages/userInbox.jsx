@@ -9,8 +9,8 @@ import { useNavigate } from "react-router-dom";
 import { AiOutlineArrowRight, AiOutlineSend } from "react-icons/ai";
 import { TfiGallery } from "react-icons/tfi";
 import styles from "../style/Style";
-const ENDPOINT = "http://localhost:4000/";
-const socketId = socketIO(ENDPOINT, { transports: ["websocket"] });
+const ENDPOINT = "http://localhost:4000";
+const socket = socketIO(ENDPOINT, { transports: ["websocket"] });
 
 const UserInbox = () => {
   const { user,loading } = useSelector((state) => state.user);
@@ -27,7 +27,7 @@ const UserInbox = () => {
   const scrollRef = useRef(null);
 
   useEffect(() => {
-    socketId.on("getMessage", (data) => {
+    socket.on("getMessage", (data) => {
       setArrivalMessage({
         sender: data.senderId,
         text: data.text,
@@ -63,8 +63,8 @@ const UserInbox = () => {
   useEffect(() => {
     if (user) {
       const sellerId = user?._id;
-      socketId.emit("addUser", sellerId);
-      socketId.on("getUsers", (data) => {
+      socket.emit("addUser", sellerId);
+      socket.on("getUsers", (data) => {
         setOnlineUsers(data);
       });
     }
@@ -106,7 +106,7 @@ const UserInbox = () => {
       (member) => member !== user?._id
     );
 
-    socketId.emit("sendMessage", {
+    socket.emit("sendMessage", {
       senderId: user?._id,
       receiverId,
       text: newMessage,
@@ -130,7 +130,7 @@ const UserInbox = () => {
   };
 
   const updateLastMessage = async () => {
-    socketId.emit("updateLastMessage", {
+    socket.emit("updateLastMessage", {
       lastMessage: newMessage,
       lastMessageId: user._id,
     });
@@ -167,7 +167,7 @@ const UserInbox = () => {
   //     (member) => member !== user._id
   //   );
 
-  //   socketId.emit("sendMessage", {
+  //   socket.emit("sendMessage", {
   //     senderId: user._id,
   //     receiverId,
   //     images: e,
