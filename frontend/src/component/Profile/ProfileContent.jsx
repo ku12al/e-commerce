@@ -14,6 +14,7 @@ import {
   updateUserInformation,
   updateUserAddress,
   deleteUserAddress,
+  loadUser,
 } from "../../redux/action/user";
 import { Button } from "antd";
 import { MdTrackChanges } from "react-icons/md";
@@ -44,31 +45,28 @@ const ProfileContent = ({ active }) => {
   }, [error, successMessage]);
 
   const handleImage = async (e) => {
-    const file = e.target.files[0];
-    toast.error("error 1");
+    const reader = new FileReader();
 
-    setAvatar(file);
-    toast.error("error 2");
-
-    const formData = new FormData();
-    toast.error("error 3");
-
-    formData.append("image", e.target.files[0]);
-    toast.error("error 4");
-
-    await axios
-      .put(`${server}/user/update-avatar`, formData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-        withCredentials: true,
-      })
-      .then((response) => {
-        window.location.reload();
-      })
-      .catch((error) => {
-        toast.error(error);
-      });
+    reader.onload = () => {
+      if (reader.readyState === 2) {
+        setAvatar(reader.result);
+        axios
+          .put(`${server}/user/update-avatar`, 
+            {avatar: reader.result},
+            {
+              withCredentials: true,
+            }
+          )
+          .then((response) => {
+            dispatch(loadUser());
+            toast.success("avatar updated successfully!")
+          })
+          .catch((error) => {
+            toast.error(error);
+          });
+      }
+    };
+    reader.readAsDataURL(e.target.files[0]);
   };
 
   const handleSubmit = (e) => {
@@ -84,7 +82,7 @@ const ProfileContent = ({ active }) => {
           <div className="flex justify-center w-full">
             <div className="relative">
               <img
-                src={`${backend_url}${user?.avatar}`}
+                src={`${user?.avatar?.url}`}
                 className="w-[150px] h-[150px] rounded-full object-cover border-[3px] border-[#3ad132]"
                 alt=""
               />
@@ -288,15 +286,16 @@ const AllOrders = () => {
 };
 
 const AllRefundOrders = () => {
-  const {user} = useSelector((state)=> state.user);
-  const {orders} = useSelector((state)=> state.order);
+  const { user } = useSelector((state) => state.user);
+  const { orders } = useSelector((state) => state.order);
   const dispatch = useDispatch();
 
-  useEffect(()=>{
-    dispatch(getAllOrdersOfUser(user._id))
-  }, [])
+  useEffect(() => {
+    dispatch(getAllOrdersOfUser(user._id));
+  }, []);
 
-  const eligibleOrder = orders && orders.filter((item) => item.status === "Processing refund")
+  const eligibleOrder =
+    orders && orders.filter((item) => item.status === "Processing refund");
 
   const columns = [
     { field: "id", headerName: "Order ID", minWidth: 150, flex: 0.7 },
@@ -446,7 +445,6 @@ const TrackOrder = () => {
       });
     });
 
-
   return (
     <div className="pl-8 pt-1">
       <DataGrid
@@ -468,18 +466,21 @@ const ChangePassword = () => {
   const passwordChangeHandler = async (e) => {
     e.preventDefault();
 
-    await axios.put(
-      `${server}/user/update-user-password`,
-      { oldPassword, newPassword, confirmPassowrd },
-      { withCredentials: true }
-    ).then((res) =>{
-      toast.success(res.data.success)
-      setOldPassword("")
-      setNewPassword("")
-      setComfirmPassword("")
-    }).catch((error) => {
-      toast.error(error.response.data.message)
-    })
+    await axios
+      .put(
+        `${server}/user/update-user-password`,
+        { oldPassword, newPassword, confirmPassowrd },
+        { withCredentials: true }
+      )
+      .then((res) => {
+        toast.success(res.data.success);
+        setOldPassword("");
+        setNewPassword("");
+        setComfirmPassword("");
+      })
+      .catch((error) => {
+        toast.error(error.response.data.message);
+      });
   };
   return (
     <div className="w-full px-5">
@@ -564,7 +565,14 @@ const Address = () => {
       toast.error("Please fill all the fields!");
     } else {
       dispatch(
-        updateUserAddress(country, city, address1, address2, zipCode, addressType)
+        updateUserAddress(
+          country,
+          city,
+          address1,
+          address2,
+          zipCode,
+          addressType
+        )
       );
       setOpen(false);
       setCountry("");

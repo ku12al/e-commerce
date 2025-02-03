@@ -5,6 +5,7 @@ import { useSelector } from "react-redux";
 
 const Events = () => {
   const { allEvents, isLoading } = useSelector((state) => state.events);
+  console.log(allEvents)
 
   return (
     <div>
@@ -15,9 +16,9 @@ const Events = () => {
           </div>
 
           <div className="w-full grid">
-            {allEvents.length !== 0 && (
+            {/* {allEvents.length !== 0 && (
               <EventCard data={allEvents && allEvents[0]} />
-            )}
+            )} */}
             <h4 className="text-[25px] font-[400] ml-10">
               {allEvents?.length === 0 && `No Events have!`}{" "}
             </h4>

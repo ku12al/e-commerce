@@ -1,5 +1,6 @@
 const app = require("./app");
 const connecDatabase = require("./db/Database");
+const cloudinary = require("cloudinary")
 
 //Handel error
 process.on("unhandledRejection", (err) => {
@@ -16,6 +17,12 @@ if (process.env.NODE_ENV !== "production") {
 
 //connect database
 connecDatabase();
+
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET
+})
 
 //server start running
 const server = app.listen(process.env.PORT, () => {

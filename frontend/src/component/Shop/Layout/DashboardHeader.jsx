@@ -8,7 +8,7 @@ import { BiMessageSquareDetail } from "react-icons/bi";
 import { backend_url } from "../../../server";
 
 const DashboardHeader = () => {
-  const { seller, isSeller } = useSelector((state) => state.seller);
+  const { seller } = useSelector((state) => state.seller);
 
   return (
     <div className="w-full h-[70px] bg-white shadow sticky top-0 left-0 z-30 flex items-center justify-between px-4">
@@ -66,7 +66,7 @@ const DashboardHeader = () => {
 
           <Link to={`/shop/${seller?._id}`}>
             <img
-              src={`${backend_url}${seller?.avatar}`}
+              src={`${seller.avatar?.url}`}
               alt=""
               className="w-[50px] h-[50px] rounded-full object-cover"
             />

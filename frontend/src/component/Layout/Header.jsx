@@ -191,21 +191,19 @@ const Header = ({ activeHeading }) => {
             <div className={`${styles.noramlFlex}`}>
               <div className="relative cursor-pointer">
                 {isAuthenticated ? (
-                    <Link to="/profile">
-                      {user && user.avatar && (
-                        <img
-                          src={`${user?.avatar?.url}`}
-                          alt=""
-                          className="w-[50px] h-[50px] rounded-full border-[3px] border-[#0eae88]"
-                        />
-                      )}
-                    </Link>
+                  <Link to="/profile">
+                    {user && user.avatar && (
+                      <img
+                        src={`${user?.avatar?.url}`}
+                        alt=""
+                        className="w-[50px] h-[50px] rounded-full border-[3px] border-[#0eae88]"
+                      />
+                    )}
+                  </Link>
                 ) : (
-                    <Link
-                      to="/login"
-                    >
-                      <CgProfile size={30} color="rgb(255 255 255 / 83%)" />
-                    </Link>
+                  <Link to="/login">
+                    <CgProfile size={30} color="rgb(255 255 255 / 83%)" />
+                  </Link>
                 )}
               </div>
             </div>
@@ -247,13 +245,21 @@ const Header = ({ activeHeading }) => {
           </div>
 
           <div>
-            <div className="relative mr-[20px]">
+            <div
+              className="relative mr-[20px]"
+              onClick={() => setOpenCart(true)}
+            >
               <AiOutlineShoppingCart size={30} className="cursor-pointer" />
               <span className="absolute right-0 top-0 rounded-full bg-[#ff5a3d] w-4 h-4 right top p-0 m-0 text-white font-mono text-[12px] leading-tight text-center">
                 {cart && cart.length}
               </span>
             </div>
           </div>
+          {/* cart popup */}
+          {openCart ? <Cart setOpenCart={setOpenCart} /> : null}
+
+          {/* wishlist popup */}
+          {openWishlist ? <Wishlist setOpenWishlist={setOpenWishlist} /> : null}
         </div>
 
         {/* header sidebar */}
@@ -264,20 +270,20 @@ const Header = ({ activeHeading }) => {
             <div className="fixed w-[60%] bg-[#fff] h-screen top-0 left-0 z-10 overflow-y-scroll">
               <div className="w-full justify-between flex pr-3">
                 <div>
-                  <div className="relative mr-[15px]">
+                  <div className="relative mr-[15px]" onClick={() => setOpenWishlist(true) || setOpen(true)}>
                     <AiOutlineHeart size={30} className="mt-5 ml-3" />
                     <span className="absolute right-0 top-0 rounded-full bg-[#ff5a3d] w-4 h-4 right top p-0 m-0 text-white font-mono text-[12px] leading-tight text-center">
-                      0
+                      {wishlist && wishlist.length}
                     </span>
                   </div>
                 </div>
-                <div className="flex w-full justify-end pt-5 pr-5">
+                {/* <div className="flex w-full justify-end pt-5 pr-5"> */}
                   <RxCross1
                     size={25}
                     className="cursor-pointer"
                     onClick={() => setOpen(false)}
                   />
-                </div>
+                {/* </div> */}
               </div>
 
               <div className="my-8 w-[92%] m-auto h-[40px] relative">
@@ -298,7 +304,7 @@ const Header = ({ activeHeading }) => {
                         <Link to={`/product/${Product_name}`}>
                           <div className="w-full flex items-start-py-3">
                             <img
-                              src={i.image_Url[0].url}
+                              src={i.image_Url[0]?.url}
                               alt=""
                               className="w-[40px] h-[40px] mr-[10px]"
                             />
@@ -331,7 +337,7 @@ const Header = ({ activeHeading }) => {
                   <div>
                     <Link to="/profile">
                       <img
-                        src={`${backend_url}${user.avatar}`}
+                        src={`${user.avatar?.url}`}
                         alt=""
                         className="w-[40px] h-[40px] rounded-full border-[4px] border-[#0eae88]"
                       />

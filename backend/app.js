@@ -26,7 +26,7 @@ if(process.env.NODE_ENV !== 'production'){
 }
 
 const user = require("./controller/user");
-const shop = require("./controller/seller");
+const shop = require("./controller/shop");
 const product = require("./controller/product");
 const event = require("./controller/event");
 const coupon = require("./controller/couponCode")

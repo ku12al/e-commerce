@@ -10,39 +10,31 @@ const sendMail = require("../utils/sendMail");
 const sendToken = require("../utils/jwtToken");
 const { isAuthenticated } = require("../middleware/auth");
 const upload = require("../multer");
-
 //create user singup
 router.post("/create-user", upload.single("file"), async (req, res, next) => {
   try {
-    const { email } = req.body;
+    const {name, email, password, avatar } = req.body;
     const userEmail = await User.findOne({ email: email });
     console.log(userEmail)
     if (userEmail) {
-      const filename = req.file.filename;
-      const filePath = `uploads/${filename}`;
-      fs.unlink(filePath, (err) => {
-        if (err) {
-          console.log(err);
-          res.status(500).json({ message: "Error deleting file" });
-        } else {
-          res.json({ message: " file deleted successfully" });
-        }
-      });
-      return next(new ErrorHandler("seller already exists", 400));
+      return next(new ErrorHandler("User already exists", 400));
     }
     const filename = req.file.filename;
 
-    const fileUrl = `/uploads/${filename}`;
-    // const myCloud = await cloudinary.v2.uploader.upload(avatar, {
-    //   folder: "avatars",
-    // });
+    // const fileUrl = `/uploads/${filename}`;
+    const myCloud = await cloudinary.v2.uploader.upload(avatar, {
+      folder: "avatars",
+    });
 
     const user = {
-      name: req.body.name,
-      phoneNumber: req.body.phoneNumber,
+      name: name,
+      // phoneNumber: req.body.phoneNumber,
       email: email,
-      password: req.body.password,
-      avatar: fileUrl,
+      password: password,
+      avatar: {
+        public_id: myCloud.public_id,
+        url: myCloud.secure_url
+      }
     };
 
     const activationToken = createActivationToken(user);
@@ -168,7 +160,6 @@ router.get(
 // log out user
 router.get(
   "/logout",
-  isAuthenticated,
   catchAsyncErrors(async (req, res, next) => {
     try {
       res.cookie("token", null, {
@@ -226,50 +217,54 @@ router.put(
   })
 );
 
+
 //update user avatar
 router.put(
   "/update-avatar",
   isAuthenticated,
-  upload.single("image"),
   catchAsyncErrors(async (req, res, next) => {
-    console.log("error");
     try {
+
+      if (!req.user || !req.user.id) {
+        return next(new ErrorHandler("User not authenticated", 401));
+      }
+
       const existsUser = await User.findById(req.user.id);
-      console.log(existsUser);
 
-      const existAvatarPath = `${existsUser.avatar}`;
-      console.log(existAvatarPath);
+      if (!existsUser) {
+        return next(new ErrorHandler("User not found", 404));
+      }
 
-      fs.access(existAvatarPath, fs.constants.F_OK, (err) => {
-        if (err) {
-          console.log("File does not exist:", existAvatarPath);
-        } else {
-          fs.unlink(existAvatarPath, (err) => {
-            if (err) {
-              console.error("Error deleting file:", err);
-            } else {
-              console.log("File deleted successfully.");
-            }
-          });
-        }
+      if (!req.body.avatar) {
+        return next(new ErrorHandler("Avatar is required", 400));
+      }
+
+      if (req.body.avatar !== "" && existsUser.avatar && existsUser.avatar.public_id) {
+        console.log("Destroying previous avatar...");
+        await cloudinary.v2.uploader.destroy(existsUser.avatar.public_id);
+      }
+
+      console.log("Uploading new avatar...");
+      const myCloud = await cloudinary.v2.uploader.upload(req.body.avatar, {
+        folder: "avatars",
+        width: 150,
       });
 
-      const fileUrl = path.join(req.file.filename);
-      console.log(fileUrl);
+      existsUser.avatar = {
+        public_id: myCloud.public_id,
+        url: myCloud.secure_url,
+      };
 
-      const user = await User.findByIdAndUpdate(req.user.id, {
-        avatar: fileUrl,
-      });
-      console.log(user);
-
-      await user.save();
+      await existsUser.save();
+      console.log("Avatar updated successfully");
 
       res.status(200).json({
         success: true,
-        user,
+        user: existsUser,
       });
     } catch (error) {
-      return next(new ErrorHandler(error, 500));
+      console.error("Error updating avatar:", error);
+      return next(new ErrorHandler(error.message || "Internal Server Error", 500));
     }
   })
 );
@@ -280,15 +275,15 @@ router.put(
   catchAsyncErrors(async (req, res, next) => {
     try {
       const user = await User.findById(req.user.id);
-      // const sameTypeAddress = user.addresses.find(
-      //   (address) => address.addressType === req.body.addressType
-      // );
+      const sameTypeAddress = user.addresses.find(
+        (address) => address.addressType === req.body.addressType
+      );
 
-      // if (sameTypeAddress) {
-      //   return next(
-      //     new ErrorHandler(`${req.body.addressType} address already exists`)
-      //   );
-      // }
+      if (sameTypeAddress) {
+        return next(
+          new ErrorHandler(`${req.body.addressType} address already exists`)
+        );
+      }
 
       const exixtsAddress = user.addresses.find(
         (address) => address._id === req.body._id

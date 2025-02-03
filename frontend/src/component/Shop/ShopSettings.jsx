@@ -19,47 +19,29 @@ const ShopSettings = () => {
   const [zipCode, setZipcode] = useState(seller && seller.zipCode);
 
   const dispatch = useDispatch();
-  // console.log(seller);
+  console.log(seller);
 
   const handleImage = async (e) => {
-    e.preventDefault();
-    // const reader = new FileReader();
-    // reader.onload = () => {
-    //   if(reader.readyState === 2){
-    //     setAvatar(reader.result);
-    //     axios.put(`${server}/shop/update-shop-avatar`, {avatar: reader.result}, {withCredentials:true,}).
-    //     then((res) => {
-    //       dispatch(loadSelle());
-    //       toast.success("Avatar updated successfully!")
-    //     }).catch((error) => {
-    //       toast.error(error.response.data.message);
-    //     })
-    //   }
-    // };
-    // reader.readAsDataURL(e.target.files[0]);
-    const file = e.target.files[0];
-    setAvatar(file);
-    console.log("noiwe")
-    const formData = new FormData();
-
-    formData.append("image", e.target.files[0]);
-    console.log("noiwe")
-    await axios
-      .put(`${server}/shop/update-seller-avatar`, formData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-        withCredentials: true,
-      })
-      .then((res) => {
-        console.log("noiwe")
-        dispatch(loadSeller());
-        toast.success("Avatar updated successfully!");
-      })
-      .catch((error) => {
-        console.log("error")
-        toast.error(error.response.data.message);
-      });
+    const reader = new FileReader();
+    reader.onload = () => {
+      if (reader.readyState === 2) {
+        setAvatar(reader.result);
+        axios
+          .put(
+            `${server}/shop/update-shop-avatar`,
+            { avatar: reader.result },
+            { withCredentials: true }
+          )
+          .then((res) => {
+            dispatch(loadSeller());
+            toast.success("Avatar updated successfully!");
+          })
+          .catch((error) => {
+            toast.error(error.response.data.message);
+          });
+      }
+    };
+    reader.readAsDataURL(e.target.files[0]);
   };
 
   const updateHandler = async (e) => {
@@ -74,7 +56,6 @@ const ShopSettings = () => {
           address,
           phoneNumber,
           zipCode,
-          
         },
         {
           withCredentials: true,
@@ -94,11 +75,7 @@ const ShopSettings = () => {
         <div className="w-full flex items-center justify-center">
           <div className="relative">
             <img
-              src={
-                avatar
-                  ? URL.createObjectURL(avatar)
-                  : `${backend_url}/${seller.avatar}`
-              }
+              src={`${seller?.avatar?.url}`}
               alt=""
               className="w-[200px] h-[200px] rounded-full cursor-pointer relative"
             />
