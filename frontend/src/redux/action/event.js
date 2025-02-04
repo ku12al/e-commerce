@@ -16,20 +16,18 @@ const GET_ALL_EVENTS_SUCCESS = "getAllEventsSuccess";
 const GET_ALL_EVENTS_FAIL = "getAllEventsFail";
 
 // Create an event
-export const createEvent = (newForm) => async (dispatch) => {
+export const createEvent = (data) => async (dispatch) => {
   try {
     dispatch({ type: EVENT_CREATE_REQUEST });
 
-    const config = { headers: { "Content-Type": "multipart/form-data" } };
-    const { data } = await axios.post(
+    const { dat } = await axios.post(
       `${server}/event/create-event`,
-      newForm,
-      config
+      data,
     );
 
     dispatch({
       type: EVENT_CREATE_SUCCESS,
-      payload: data.event,
+      payload: dat.event,
     });
   } catch (error) {
     dispatch({
@@ -87,7 +85,6 @@ export const getAllEvents = () => async (dispatch) => {
     dispatch({ type: GET_ALL_EVENTS_REQUEST });
 
     const { data } = await axios.get(`${server}/event/get-all-events`);
-    console.log(data)
 
     dispatch({
       type: GET_ALL_EVENTS_SUCCESS,

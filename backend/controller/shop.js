@@ -146,7 +146,7 @@ router.get(
   isSeller,
   catchAsyncErrors(async (req, res, next) => {
     try {
-      console.log(req.seller);
+      // console.log(req.seller);
       const seller = await Shop.findById(req.seller._id);
 
       if (!seller) {
@@ -186,11 +186,9 @@ router.get(
 //get shop info
 router.get(
   "/get-shop-info/:id",
-  isSeller,
   catchAsyncErrors(async (req, res, next) => {
     try {
       const shop = await Shop.findById(req.params.id);
-      console.log(shop);
       res.status(201).json({
         success: true,
         shop,
@@ -222,11 +220,11 @@ router.put(
         existsSeller.avatar &&
         existsSeller.avatar.public_id
       ) {
-        console.log("Destroying previous avatar...");
+        // console.log("Destroying previous avatar...");
         await cloudinary.v2.uploader.destroy(existsSeller.avatar.public_id);
       }
 
-      console.log("Uploading new avatar...");
+      // console.log("Uploading new avatar...");
 
       const myCloud = await cloudinary.v2.uploader.upload(req.body.avatar, {
         folder: "avatars",

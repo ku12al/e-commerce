@@ -1,10 +1,10 @@
-import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { useDispatch, useSelector } from 'react-redux';
-import { categoriesData } from '../../static/data';
-import { AiOutlinePlusCircle } from 'react-icons/ai';
+import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { categoriesData } from "../../static/data";
+import { AiOutlinePlusCircle } from "react-icons/ai";
 import { toast } from "react-toastify";
-import { createProduct } from '../../redux/action/product';
+import { createProduct } from "../../redux/action/product";
 
 const CreateProduct = () => {
   const { seller } = useSelector((state) => state.seller);
@@ -17,9 +17,9 @@ const CreateProduct = () => {
   const [description, setDescription] = useState("");
   const [category, setCategory] = useState("");
   const [tags, setTags] = useState("");
-  const [originalPrice, setOriginalPrice] = useState("");
-  const [discountPrice, setDiscountPrice] = useState("");
-  const [stock, setStock] = useState("");
+  const [originalPrice, setOriginalPrice] = useState();
+  const [discountPrice, setDiscountPrice] = useState();
+  const [stock, setStock] = useState();
 
   useEffect(() => {
     if (error) {
@@ -28,36 +28,58 @@ const CreateProduct = () => {
     if (success) {
       toast.success("Product created successfully");
       navigate("/dashboard");
-      window.location.reload(true); 
+      window.location.reload();
     }
   }, [dispatch, error, success]);
 
   const handleImageChange = (e) => {
     let files = Array.from(e.target.files);
-    setImages((prevImages) => [...prevImages, ...files]);
+    setImages([]);
+
+    files.forEach((file) => {
+      const reader = new FileReader();
+
+      reader.onload = () => {
+        if (reader.readyState === 2) {
+          setImages((old) => [...old, reader.result]);
+        }
+      };
+      reader.readAsDataURL(file);
+    });
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    if (!name || !description || !category || !discountPrice || !stock || images.length === 0) {
-      return toast.error("Please fill out all required fields and upload at least one image.");
+    if (
+      !name ||
+      !description ||
+      !category ||
+      !discountPrice ||
+      !stock ||
+      images.length === 0
+    ) {
+      return toast.error(
+        "Please fill out all required fields and upload at least one image."
+      );
     }
-
     const newForm = new FormData();
     images.forEach((image) => {
-      newForm.append("images", image);
+      newForm.set("images", image);
     });
-    newForm.append("name", name);
-    newForm.append("description", description);
-    newForm.append("category", category);
-    newForm.append("tags", tags);
-    newForm.append("originalPrice", originalPrice);
-    newForm.append("discountPrice", discountPrice);
-    newForm.append("stock", stock);
-    newForm.append("shopId", seller._id);
+    const data = {
+      name,
+      description,
+      category,
+      tags,
+      originalPrice,
+      discountPrice,
+      stock,
+      images,
+      shopId: seller._id,
+    };
 
-    dispatch(createProduct(newForm));
+    dispatch(createProduct(data));
   };
 
   return (
@@ -108,11 +130,12 @@ const CreateProduct = () => {
             required
           >
             <option value="">Choose a category</option>
-            {categoriesData && categoriesData.map((i) => (
-              <option value={i.title} key={i.title}>
-                {i.title}
-              </option>
-            ))}
+            {categoriesData &&
+              categoriesData.map((i) => (
+                <option value={i.title} key={i.title}>
+                  {i.title}
+                </option>
+              ))}
           </select>
         </div>
         <br />
@@ -186,14 +209,15 @@ const CreateProduct = () => {
             <label htmlFor="upload">
               <AiOutlinePlusCircle size={30} className="mt-3" color="#555" />
             </label>
-            {images && images.map((i, index) => (
-              <img
-                src={URL.createObjectURL(i)}
-                key={index}
-                alt=""
-                className="h-[120px] w-[120px] object-cover m-2"
-              />
-            ))}
+            {images &&
+              images.map((i, index) => (
+                <img
+                  src={i}
+                  key={i}
+                  alt=""
+                  className="h-[120px] w-[120px] object-cover m-2"
+                />
+              ))}
           </div>
           <br />
           <div>

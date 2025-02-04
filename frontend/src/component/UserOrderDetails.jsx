@@ -23,7 +23,7 @@ const UserOrderDetails = () => {
 
   useEffect(() => {
     dispatch(getAllOrdersOfUser(user._id));
-  }, [dispatch]);
+  }, [dispatch, user._id]);
 
   const reviewHandler = async (e) => {
     await axios
@@ -34,6 +34,7 @@ const UserOrderDetails = () => {
           rating,
           comment,
           productId: selectedItem?._id,
+          orderId: id,
         },
         { withCredentials: true }
       )
@@ -54,8 +55,9 @@ const UserOrderDetails = () => {
       status: "Processing refund"
     }).then((res)=>{
       toast.success(res.data.message);
+      dispatch(getAllOrdersOfUser(user._id));
     }).catch((error)=>{
-      toast.error(error);
+      toast.error(error.response.data.message);
     })
   }
 
@@ -85,17 +87,17 @@ const UserOrderDetails = () => {
         data?.cart.map((item, index) => (
           <div className="flex items-start w-full mb-5">
             <img
-              src={`${backend_url}/${item.images[0]}`}
+              src={`${item.images[0]?.url}`}
               alt=""
               className="w-[80px] h-[80px]"
             />
             <div className="w-full">
               <h5 className="text-[#00000084] pl-3 text-[20px]">{item.name}</h5>
               <h5 className="text-[#00000091] pl-3 text-[20px]">
-                {item.quantity} x ₹{item.price}
+              ₹{item.quantity} x {item.price}
               </h5>
             </div>
-            {data?.status === "Delivered" && (
+            {!item.isReviewed && data?.status === "Delivered" && (
               <div
                 className={`${styles.button} text-[#fff]`}
                 onClick={() => setOpen(true) || setSelectedItem(item)}
@@ -123,7 +125,7 @@ const UserOrderDetails = () => {
             <br />
             <div className="w-full flex">
               <img
-                src={`${backend_url}/${selectedItem?.images[0]}`}
+                src={`${selectedItem?.images[0]?.url}`}
                 alt=""
                 className="w-[80px] h-[80px]"
               />
@@ -131,7 +133,7 @@ const UserOrderDetails = () => {
                 <div className="pl-3 text-[20px]">{selectedItem?.name}</div>
                 <h4 className="pl-3 text-[20px]">
                   <span className="WebRupee">Rs.</span>
-                  {selectedItem?.discountPrice} x {selectedItem?.qty}
+                  ₹{selectedItem?.discountPrice} x {selectedItem?.qty}
                 </h4>
               </div>
             </div>
@@ -169,7 +171,7 @@ const UserOrderDetails = () => {
               <label className="block text-[20px] font-[500]">
                 Write a comment
                 <span className="ml-1 font-[400] text-[16px] text-[#00000052]">
-                  (optionn)
+                  (optional)
                 </span>
               </label>
               <textarea
@@ -215,7 +217,7 @@ const UserOrderDetails = () => {
         <div className="w-full 800px:w-[40%]">
           <h4 className="pt-3 text-[20px]">Payment Info:</h4>
           <h4 className="">
-            Status:
+            Status: {" "}
             {data?.paymentInfo?.status ? data?.paymentInfo?.status : "Not Paid"}
           </h4>
           <br />

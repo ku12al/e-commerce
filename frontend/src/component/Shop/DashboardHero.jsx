@@ -10,28 +10,23 @@ import { getAllProductsShop } from "../../redux/action/product";
 const DashboardHero = () => {
       const dispatch = useDispatch();
       const { orders} = useSelector((state) => state.order)
-      console.log(orders)
       const { seller} = useSelector((state) => state.seller)
 
       const {products} = useSelector((state) => state.products);
-      const [deliveredOrder, setDeliveredOrder] = useState(null);
-      console.log(products)
+      // const [deliveredOrder, setDeliveredOrder] = useState(null);
 
       useEffect(() => {
-        if (seller && seller._id) {  // Check if seller and seller._id exist
+        if (seller && seller._id) {
           dispatch(getAllOrdersOfShop(seller._id));
           dispatch(getAllProductsShop(seller._id));
-      
-          const orderData = orders && orders.filter((item) => item.status === "Delivered");
-          setDeliveredOrder(orderData);
         }
-      }, [dispatch, seller, orders]);
+      }, [dispatch, seller]);
       
+      const deliveredOrder = orders?.filter((item) => item.status === "Delivered") || [];
+      const totalEarningWithoutTax = deliveredOrder.reduce((acc, item) => acc + item.totalPrice, 0);
+      const serviceCharge = totalEarningWithoutTax * 0.1;
+      const availableBalance = (totalEarningWithoutTax - serviceCharge).toFixed(2);
 
-      const totalEarningEithoutTax = deliveredOrder ? deliveredOrder.reduce((acc, item) => acc + item.totalPrice, 0) : 0;
-
-      const serviceCharge = totalEarningEithoutTax ? totalEarningEithoutTax * 0.1 : 0;
-      const availableBalance = totalEarningEithoutTax - serviceCharge.toFixed(2) || 0;
   return (
     <div className="w-full p-8">
       <h3 className="text-[22px] font-Poppins pb-2">Overview</h3>

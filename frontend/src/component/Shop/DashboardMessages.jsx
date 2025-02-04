@@ -199,6 +199,7 @@ const MessageList = ({
   setActiveStatus
 }) => {
   const navigate = useNavigate();
+  const [user, setUser] = useState([]);
   const handleClick = (id) => {
     navigate(`/dashboard-messages?${id}`);
     setOpen(true);
@@ -224,23 +225,27 @@ const MessageList = ({
         active === index ? "bg-[#00000010]" : "bg-transparent"
       }  cursor-pointer`}
       onClick={(e) =>
-        setActive(index) || handleClick(data._d) || setCurrentChat(data)
+        setActive(index) || handleClick(data._d) || setCurrentChat(data) || setUserData(user) || setActiveStatus(online)
       }
     >
       <div className="relative">
         <img
-          src={`${backend_url}/${userData.avatar}`}
+          src={`${user?.avatar?.url}`}
           alt=""
           className="w-[50px] h-[50px] rounded-full"
         />
-        <div className="w-[12px] h-[12px] bg-green-400 rounded-full absolute top-[2px] right-[2px]" />
+        {online ? (
+          <div className="w-[12px] h-[12px] bg-green-400 rounded-full absolute top-[2px] right-[2px]" />
+        ) : (
+          <div className="w-[12px] h-[12px] bg-[#c7b9b9] rounded-full absolute top-[2px] right-[2px]" />
+        )}
       </div>
       <div className="pl-3">
-        <h1 className="text-[18px]">{userData?.name}</h1>
+        <h1 className="text-[18px]">{user?.name}</h1>
         <p className="text-[16px] text-[#000c]">
-          {data?.lastMessageId !== userData?._id
+          {data?.lastMessageId !== user?._id
             ? "You:"
-            : userData.name.split(" ")[0] + ": "}{" "}
+            : user?.name.split(" ")[0] + ": "}{" "}
           {data?.lastMessage}
         </p>
       </div>
@@ -252,6 +257,7 @@ const SellerInbox = ({
   setOpen,
   newMessage,
   setNewMessage,
+  sendMessageHandler,
   messages,
   sellerId,
   userData,
@@ -263,7 +269,7 @@ const SellerInbox = ({
       <div className="w-full flex p-3 items-center justify-between bg-slate-200">
         <div className="flex">
           <img
-            src={`${backend_url}/${userData.avatar}`}
+            src={`${userData.avatar?.url}`}
             className="w-[60px] h-[60px] rounded-full"
           />
           <div className="pl-3">
@@ -309,14 +315,15 @@ const SellerInbox = ({
       <form
         aria-required={true}
         className="p-3 relative w-full justify-between items-center"
+        onSubmit={sendMessageHandler}
       >
-        <div>
+        <div className="w-[30px]">
           <input type="file" name="" id="image" className="hidden" />
           <label htmlFor="image">
             <TfiGallery className="cursor-pointer" size={20} />
           </label>
         </div>
-        <div>
+        <div className="w-full">
           <input
             type="text"
             required

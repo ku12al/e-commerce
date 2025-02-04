@@ -16,20 +16,14 @@ const GET_ALL_PRODUCTS_SUCCESS = "getAllProductsSuccess";
 const GET_ALL_PRODUCTS_FAIL = "getAllProductsFail";
 
 // Create a product
-export const createProduct = (newForm) => async (dispatch) => {
+export const createProduct = (data) => async (dispatch) => {
   try {
     dispatch({ type: PRODUCT_CREATE_REQUEST });
-
-    const config = { headers: { "Content-Type": "multipart/form-data" } };
-    const { data } = await axios.post(
-      `${server}/product/create-product`,
-      newForm,
-      config
-    );
+    const { dat } = await axios.post(`${server}/product/create-product`, data);
 
     dispatch({
       type: PRODUCT_CREATE_SUCCESS,
-      payload: data.product,
+      payload: dat.product,
     });
   } catch (error) {
     dispatch({
@@ -47,7 +41,6 @@ export const getAllProductsShop = (id) => async (dispatch) => {
     const { data } = await axios.get(
       `${server}/product/get-all-products-shop/${id}`
     );
-    console.log(data);
 
     dispatch({
       type: GET_ALL_PRODUCTS_SHOP_SUCCESS,
@@ -67,7 +60,7 @@ export const deleteProduct = (id) => async (dispatch) => {
     dispatch({ type: DELETE_PRODUCT_REQUEST });
 
     const { data } = await axios.delete(
-      `${server}/product/delete-shop-product/${id}`,
+      `${server}/product/delete-shop-product/${id}`
       // { withCredentials: true }
     );
 
@@ -89,7 +82,7 @@ export const getAllProducts = () => async (dispatch) => {
     dispatch({ type: GET_ALL_PRODUCTS_REQUEST });
 
     const { data } = await axios.get(`${server}/product/get-all-products`);
-    console.log(data)
+    console.log(data);
     dispatch({
       type: GET_ALL_PRODUCTS_SUCCESS,
       payload: data.product,

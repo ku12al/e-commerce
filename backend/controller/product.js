@@ -6,34 +6,51 @@ const Shop = require("../model/shop");
 const ErrorHandler = require("../utils/ErrorHandler");
 const upload = require("../multer");
 const fs = require("fs");
-const { isAuthenticated } = require("../middleware/auth");
+const { isAuthenticated, isSeller, isAdmin } = require("../middleware/auth");
+const Order = require("../model/order");
+const cloudinary = require("cloudinary");
 
 router.post(
   "/create-product",
-  upload.array("images"),
   catchAsyncError(async (req, res, next) => {
     try {
       const shopId = req.body.shopId;
       const shop = await Shop.findById(shopId);
 
       if (!shop) {
-        return next(new ErrorHandler("shop Id is invalid"));
+        return next(new ErrorHandler("shop Id is invalid", 400));
       } else {
-        const files = req.files;
+        let images = [];
 
-        const imageUrls = files.map((file) => `${file.filename}`);
+        if (typeof req.body.images === "string") {
+          images.push(req.body.images);
+        } else {
+          images = req.body.images;
+        }
+
+        const imagesLinks = [];
+
+        for (let i = 0; i < images.length; i++) {
+          const result = await cloudinary.v2.uploader.upload(images[i], {
+            folder: "products",
+          });
+
+          imagesLinks.push({
+            public_id: result.public_id,
+            url: result.secure_url,
+          });
+        }
+
         const productData = req.body;
-        productData.images = imageUrls;
-
+        productData.images = imagesLinks;
         productData.shop = shop;
 
         const product = await Product.create(productData);
-        console.log(product);
+
         res.status(201).json({
           success: true,
           product,
         });
-        console.log(product);
       }
     } catch (error) {
       return next(new ErrorHandler(error, 400));
@@ -61,31 +78,26 @@ router.get(
 //delete product of a shop
 router.delete(
   "/delete-shop-product/:id",
+  isSeller,
   catchAsyncError(async (req, res, next) => {
     try {
-      const productId = req.params.id;
+      const product = await Product.findById(req.params.id);
 
-      const productData = await Product.findById(productId);
-
-      productData.images.forEach((imageUrl) => {
-        const filename = imageUrl;
-        const filePath = `uploads/${filename}`;
-
-        fs.unlink(filePath, (err) => {
-          if (err) {
-            console.log(err);
-          } else {
-            console.log("File deleted successfully");
-          }
-        });
-      });
-      const product = await Product.findByIdAndDelete(productId);
       if (!product) {
-        return next(new ErrorHandler("Product not found with this id!", 500));
+        return next(new ErrorHandler("Product is not found with this id", 404));
+      }    
+
+      for (let i = 0; 1 < product.images.length; i++) {
+        const result = await cloudinary.v2.uploader.destroy(
+          product.images[i].public_id
+        );
       }
+    
+      await product.remove();
+
       res.status(201).json({
         success: true,
-        message: "Product will be deleted",
+        message: "Product Deleted successfully!",
       });
     } catch (error) {
       return next(new ErrorHandler(error, 400));
@@ -115,7 +127,7 @@ router.put(
   isAuthenticated,
   catchAsyncError(async (req, res, next) => {
     try {
-      const { user, rating, comment, productId } = req.body;
+      const { user, rating, comment, productId, orderId } = req.body;
       const product = await Product.findById(productId);
 
       const review = {
@@ -141,7 +153,7 @@ router.put(
 
       let avg = 0;
       product.reviews.forEach((rev) => {
-        avg += rev.reating;
+        avg += rev.rating;
       });
 
       product.ratings = avg / product.reviews.length;
@@ -168,4 +180,23 @@ router.put(
   })
 );
 
+// all products --- for admin
+router.get(
+  "/admin-all-products",
+  isAuthenticated,
+  isAdmin("Admin"),
+  catchAsyncError(async (req, res, next) => {
+    try {
+      const products = await Product.find().sort({
+        createdAt: -1,
+      });
+      res.status(201).json({
+        success: true,
+        products,
+      });
+    } catch (error) {
+      return next(new ErrorHandler(error.message, 500));
+    }
+  })
+);
 module.exports = router;
