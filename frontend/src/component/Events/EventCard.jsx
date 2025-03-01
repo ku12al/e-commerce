@@ -5,10 +5,11 @@ import { useDispatch, useSelector } from "react-redux";
 import { addTocart } from "../../redux/action/cart.js";
 import { toast } from "react-toastify";
 import styles from "../../style/Style.js";
-import { backend_url } from "../../server.js";
+
 
 const EventCard = ({ active, data }) => {
   const { cart } = useSelector((state) => state.cart);
+  // console.log(cart);
   const dispatch = useDispatch();
   const addToCartHandler = (data) => {
     const isItemExists = cart && cart.find((i) => i._id === data._id);

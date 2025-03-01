@@ -15,7 +15,7 @@ const WithdrawMoney = () => {
   const [deliveredOrder, setDeliveredOrder] = useState(null);
 
   useEffect(() => {
-    dispatch(getAllOrdersOfShop(seller._id));
+    dispatch(getAllOrdersOfShop(seller?._id));
     const orderData = orders && orders.filter((item) => item.status === "Delivered");
     setDeliveredOrder(orderData);
   }, [dispatch]);
@@ -27,7 +27,7 @@ const WithdrawMoney = () => {
   return (
     <div className='w-full h-[90vh] p-8'>
       <div className='w-full bg-white h-full rounded flex items-center justify-center flex-col shadow-2xl'>
-            <h5 className='text-[20px] mb-2'>Available Balance: ${availbleBalance}</h5>
+            <h5 className='text-[20px] mb-2'>Available Balance: ₹{availbleBalance}</h5>
             <div className={`${styles.button} text-white !h-[42px] !rounded`}>Withdraw</div>
       </div>
     </div>
