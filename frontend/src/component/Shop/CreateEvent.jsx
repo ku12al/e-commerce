@@ -56,7 +56,8 @@ const CreateEvent = () => {
         navigate("/dashboard-events");
         window.location.reload();
       }
-    }, [error, success]);
+    }, [error, success, navigate]);
+    
 
   const handleImageChange = (e) => {
     const files = Array.from(e.target.files);

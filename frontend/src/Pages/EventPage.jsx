@@ -15,7 +15,17 @@ const EventsPage = () => {
       ) : (
         <div>
           <Header activeHeading={4} />
-          <EventCard active={true} data={allEvents && allEvents[0]} />
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6 p-4">
+            {allEvents?.length > 0 ? (
+              allEvents.map((event, index) => (
+                <EventCard key={index} active={true} data={event} />
+              ))
+            ) : (
+              <h4 className="text-[25px] font-[400] ml-10">
+                No Events Available!
+              </h4>
+            )}
+          </div>
         </div>
       )}
     </>

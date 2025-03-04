@@ -91,25 +91,29 @@ router.delete(
   catchAsyncError(async (req, res, next) => {
     try {
       const event = await Event.findById(req.params.id);
+      console.log("ifowneio")
 
-      if (!product) {
+      if (!event) {
         return next(new ErrorHandler("Product is not found with this id", 404));
       }
+      console.log("ifowneio")
 
-      for (let i = 0; 1 < product.images.length; i++) {
+      for (let i = 0; 1 < event.images.length; i++) {
         const result = await cloudinary.v2.uploader.destroy(
           event.images[i].public_id
         );
       }
+      console.log("ifowneio")
 
       await event.remove();
+      console.log("ifowneio")
 
       res.status(201).json({
         success: true,
         message: "Event Deleted successfully!",
       });
     } catch (error) {
-      return next(new ErrorHandler(error, 400));
+      return next(new ErrorHandler(error, 500));
     }
   })
 );

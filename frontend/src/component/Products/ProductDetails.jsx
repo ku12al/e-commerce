@@ -11,7 +11,7 @@ import {
 import { backend_url, server } from "../../server";
 import { getAllProductsShop } from "../../redux/action/product";
 import { addToWishlist, removeFromwishlist } from "../../redux/action/wishlist";
-import { addTocart } from "../../redux/action/cart";
+import { addToCart } from "../../redux/action/cart";
 import { toast } from "react-toastify";
 import Ratings from "./Ratings";
 import axios from "axios";
@@ -63,7 +63,7 @@ const ProductDetails = ({ data }) => {
         toast.success("Product stock limited");
       } else {
         const cartData = { ...data, qty: count };
-        dispatch(addTocart(cartData));
+        dispatch(addToCart(cartData));
         toast.success("Item added to cart successfully");
       }
     }
@@ -157,10 +157,10 @@ const ProductDetails = ({ data }) => {
 
                 <div className="flex pt-3">
                   <h4 className={`${styles.productDiscountPrice}`}>
-                    {data.discountPrice}$
+                    {data.discountPrice} ₹
                   </h4>
                   <h3 className={`${styles.price}`}>
-                    {data.originalPrice ? data.originalPrice + "$" : null}
+                    {data.originalPrice ? data.originalPrice + " ₹" : null}
                   </h3>
                 </div>
 

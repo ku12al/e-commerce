@@ -6,7 +6,7 @@ import { HiOutlineMinus, HiPlus } from "react-icons/hi";
 import styles from "../../style/Style";
 import { backend_url } from "../../server";
 import { useDispatch, useSelector } from "react-redux";
-import { addTocart, removeFromCart } from "../../redux/action/cart";
+import { addToCart, removeFromCart } from "../../redux/action/cart";
 import { toast } from "react-toastify";
 
 const Cart = ({ setOpenCart }) => {
@@ -23,7 +23,7 @@ const Cart = ({ setOpenCart }) => {
   );
 
   const quantityChangeHandler = (data) => {
-    dispatch(addTocart(data));
+    dispatch(addToCart(data));
   };
   return (
     <div className="fixed top-0 left-0 w-full bg-[#0000004b] h-screen z-10">

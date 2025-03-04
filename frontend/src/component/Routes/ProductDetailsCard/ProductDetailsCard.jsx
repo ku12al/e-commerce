@@ -10,7 +10,7 @@ import {
 import { set } from "mongoose";
 import { useDispatch, useSelector } from "react-redux";
 import { toast } from "react-toastify";
-import { addTocart } from "../../../redux/action/cart";
+import { addToCart } from "../../../redux/action/cart";
 import {
   addToWishlist,
   removeFromwishlist,
@@ -47,7 +47,7 @@ const ProductDetailsCard = ({ setOpen, data }) => {
         toast.success("Product stock limited");
       } else {
         const cartData = { ...data, qty: count };
-        dispatch(addTocart(cartData));
+        dispatch(addToCart(cartData));
         toast.success("Item added to cart successfully");
       }
     }
@@ -122,10 +122,10 @@ const ProductDetailsCard = ({ setOpen, data }) => {
 
                 <div className="flex pt-3">
                   <h4 className={`${styles.productDiscountPrice}`}>
-                    {data.discountPrice} $
+                  {data.discountPrice ? data.discountPrice : data.originalPrice} ₹
                   </h4>
                   <h3 className={`${styles.price}`}>
-                    {data.originalPrice ? data.originalPrice + "$" : null}
+                    {data.originalPrice ? data.originalPrice + " ₹" : null}
                   </h3>
                 </div>
                 <div className="flex items-center mt-12 justify-between pr-3">
