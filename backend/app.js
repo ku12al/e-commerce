@@ -13,8 +13,7 @@ app.use(cookieParser());
 app.use(cors({
       origin: [
             "http://localhost:3000", // Development
-            "https://e-commerce-f19liklsq-kunal-kumars-projects-692888f8.vercel.app",
-            "https://e-commerce-bice-psi.vercel.app/" // Vercel Frontend
+            "https://e-commerce-bice-psi.vercel.app/"
           ],
       credentials: true
 }));
