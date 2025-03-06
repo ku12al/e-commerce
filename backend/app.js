@@ -11,7 +11,10 @@ const cors = require("cors");
 app.use(express.json());
 app.use(cookieParser());
 app.use(cors({
-      origin: "http://localhost:3000",
+      origin: [
+            "http://localhost:3000", // Development
+            "https://e-commerce-f19liklsq-kunal-kumars-projects-692888f8.vercel.app" // Vercel Frontend
+          ],
       credentials: true
 }));
 app.use("/", express.static("uploads"))
