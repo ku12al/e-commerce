@@ -8,8 +8,9 @@ import {
 } from "react-icons/ai";
 import styles from "../../style/Style";
 import { Link } from "react-router-dom";
-// import { DataGrid } from "ag-grid-react";
-import { DataGrid } from "@material-ui/data-grid";
+import { DataGrid } from "@mui/x-data-grid";
+// import { Button } from "@mui/material";
+
 import {
   updateUserInformation,
   updateUserAddress,

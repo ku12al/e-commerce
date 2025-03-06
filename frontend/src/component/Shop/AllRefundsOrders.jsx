@@ -1,5 +1,6 @@
-import { Button } from "@material-ui/core";
-import { DataGrid } from "@material-ui/data-grid";
+import { DataGrid } from "@mui/x-data-grid";
+import { Button } from "@mui/material";
+
 import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { getAllProductsShop, deleteProduct } from '../../redux/action/product';

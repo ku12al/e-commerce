@@ -1,11 +1,12 @@
-import { Button } from "@material-ui/core";
-import { DataGrid } from "@material-ui/data-grid";
+
 import React, { useEffect } from "react";
 import { AiOutlineDelete, AiOutlineEye } from "react-icons/ai";
 import { useDispatch, useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 import Loader from "../Layout/Loader";
 import { deleteProduct, getAllProductsShop } from "../../redux/action/product";
+import { DataGrid } from "@mui/x-data-grid";
+import { Button } from "@mui/material";
 
 const AllProducts = () => {
   const { products, isLoading, deleteSuccess } = useSelector((state) => state.products);
