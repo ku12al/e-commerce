@@ -12,11 +12,13 @@ app.use(express.json());
 app.use(cookieParser());
 app.use(cors({
       origin: [
-            "http://localhost:3000", // Development
-            "https://e-commerce-bice-psi.vercel.app/"
-          ],
-      credentials: true
-}));
+        "http://localhost:3000", // Local development
+        "https://e-commerce-bice-psi.vercel.app" // Vercel frontend
+      ],
+      credentials: true, 
+      methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+      allowedHeaders: ["Content-Type", "Authorization"]
+    }));
 app.use("/", express.static("uploads"))
 app.use(bodyParser.urlencoded({extended:true,limit:"50mb"}));
 
