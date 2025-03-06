@@ -276,8 +276,8 @@ const AllOrders = () => {
   return (
     <div className="pl-8 pt-1">
       <DataGrid
-        // rows={row}
-        // columns={columns}
+        rows={row}
+        columns={columns}
         pageSize={10}
         disableSelectionOnClick
         autoHeight

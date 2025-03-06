@@ -208,69 +208,62 @@ const App = () => {
               <Route
                 path="/order/:id"
                 element={
-                  <ShopOrdersDetails />
-                  // <SellerProtectedRoute>
-
-                  // </SellerProtectedRoute>
+                  <SellerProtectedRoute>
+                    <ShopOrdersDetails />
+                  </SellerProtectedRoute>
                 }
               />
 
               <Route
                 path="/dashboard-products"
                 element={
-                  <ShopAllProducts />
-                  // <SellerProtectedRoute>
-
-                  // </SellerProtectedRoute>
+                  <SellerProtectedRoute>
+                    <ShopAllProducts />
+                  </SellerProtectedRoute>
                 }
               />
 
               <Route
                 path="/dashboard-create-event"
                 element={
-                  <ShopCreateEvents />
-                  // <SellerProtectedRoute>
-
-                  // </SellerProtectedRoute>
+                  <SellerProtectedRoute>
+                    <ShopCreateEvents />
+                  </SellerProtectedRoute>
                 }
               />
 
               <Route
                 path="/dashboard-events"
                 element={
-                  <ShopAllEvents />
-                  // <SellerProtectedRoute>
-
-                  // </SellerProtectedRoute>
+                  <SellerProtectedRoute>
+                    <ShopAllEvents />
+                  </SellerProtectedRoute>
                 }
               />
 
               <Route
                 path="/dashboard-coupouns"
                 element={
-                  <ShopAllCoupouns />
-                  // <SellerProtectedRoute>
-
-                  // </SellerProtectedRoute>
+                  <SellerProtectedRoute>
+                    <ShopAllCoupouns />
+                  </SellerProtectedRoute>
                 }
               />
 
               <Route
                 path="/dashboard-withdraw-money"
                 element={
-                  <ShopWithdrawMoneyPage />
-                  // <SellerProtectedRoute>
-
-                  // </SellerProtectedRoute>
+                  <SellerProtectedRoute>
+                    <ShopWithdrawMoneyPage />
+                  </SellerProtectedRoute>
                 }
               />
               <Route
                 path="/dashboard-messages"
                 element={
-                  <ShopInboxPage />
-                  // <SellerProtectedRoute>
-
-                  // </SellerProtectedRoute>
+                  <SellerProtectedRoute>
+                    <ShopInboxPage />
+                  </SellerProtectedRoute>
                 }
               />
             </Routes>
