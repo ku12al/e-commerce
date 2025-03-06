@@ -7,7 +7,6 @@ import {
   AiOutlineHeart,
   AiFillHeart,
 } from "react-icons/ai";
-import { set } from "mongoose";
 import { useDispatch, useSelector } from "react-redux";
 import { toast } from "react-toastify";
 import { addToCart } from "../../../redux/action/cart";
